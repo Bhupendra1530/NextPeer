@@ -127,3 +127,34 @@ export interface FreeResource {
   icon: LucideIcon;
   label: string;
 }
+
+export interface StatBox { icon: LucideIcon; value: string; label: string; }
+export interface CurriculumModule { number: string; icon: LucideIcon; title: string; topics: string[]; }
+export interface ProjectItem { icon: LucideIcon; title: string; key?: string; }
+export interface ToolItem { icon: LucideIcon; label: string; key?: string; }
+export interface CareerRole { label: string; }
+export interface SalaryRow { experience: string; salary: string; }
+export interface WhyChoosePoint { icon: LucideIcon; label: string; }
+export interface JourneyStep { number: number; label: string; icon: LucideIcon; }
+export interface FaqItem { question: string; answer: string; }
+export interface ProgramDetail {
+  slug: string;
+  tagline: string;
+  titleLine1: string;
+  titleLine2: string;
+  description: string;
+  heroBadges: ToolItem[];
+  quickHighlights: string[];
+  whyLearnTitle: string;
+  whyLearnDescription: string;
+  whyLearnStats: StatBox[];
+  curriculum: CurriculumModule[];
+  projects: ProjectItem[];
+  tools: ToolItem[];
+  careerRoles: CareerRole[];
+  salaryRows: SalaryRow[];
+  whyChoosePoints: WhyChoosePoint[];
+  certificateTitle: string;
+  journeySteps: JourneyStep[];
+  faqs: FaqItem[];
+}
