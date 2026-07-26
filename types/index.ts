@@ -141,6 +141,7 @@ export interface ProgramDetail {
   slug: string;
   tagline: string;
   titleLine1: string;
+  heroInitials: string;
   titleLine2: string;
   description: string;
   heroBadges: ToolItem[];

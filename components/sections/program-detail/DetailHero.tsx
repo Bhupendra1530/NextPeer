@@ -39,9 +39,9 @@ export default function DetailHero({ p }: { p: ProgramDetail }) {
             </div>
           </div>
 
-          <div className="relative mx-auto flex w-full max-w-sm items-center justify-center py-2 lg:max-w-none">
+          {/* Visual column: graphic + badges stacked in normal flow (no absolute overlap, safe on every screen) */}
+          <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-2 lg:max-w-none">
             <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 shadow-xl shadow-indigo-200">
-              {/* tech grid pattern overlay */}
               <div
                 className="absolute inset-0 opacity-20"
                 style={{
@@ -52,18 +52,17 @@ export default function DetailHero({ p }: { p: ProgramDetail }) {
               />
               <div className="relative flex flex-col items-center gap-2">
                 <Sparkles className="h-10 w-10 text-white/90" strokeWidth={1.5} />
-                <p className="text-4xl font-extrabold tracking-wide text-white">AI</p>
+                <p className="text-4xl font-extrabold tracking-wide text-white">{p.heroInitials}</p>
               </div>
             </div>
-            <div className="absolute -left-1 top-4 flex flex-col gap-2 sm:left-2">
+
+            <div className="flex flex-wrap justify-center gap-2.5">
               {p.heroBadges.map((b) => {
-                if (b.key) {
-                  return <TechTile key={b.label} name={b.key} size="xl" />;
-                }
+                if (b.key) return <TechTile key={b.label} name={b.key} size="md" />;
                 const Icon = b.icon;
                 return (
-                  <div key={b.label} title={b.label} className="flex h-16 w-16 items-center justify-center rounded-xl bg-white shadow-md ring-1 ring-slate-100">
-                    <Icon size={26} className="text-indigo-500" />
+                  <div key={b.label} title={b.label} className="flex h-14 w-14 items-center justify-center rounded-xl bg-white shadow-md ring-1 ring-slate-100">
+                    <Icon size={22} className="text-indigo-500" />
                   </div>
                 );
               })}

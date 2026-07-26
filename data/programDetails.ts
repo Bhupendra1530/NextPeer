@@ -57,6 +57,7 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
     slug: "artificial-intelligence-essentials",
     tagline: "Most In-Demand Skill of the Future",
     titleLine1: "Artificial Intelligence",
+    heroInitials: "AI",
     titleLine2: "Build the Future with AI",
     description:
       "Master AI through hands-on projects, real-world case studies, and industry mentorship. Learn to build intelligent systems using Python, ML, Deep Learning, NLP and Generative AI.",
@@ -177,6 +178,7 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
     slug: "cloud-computing-fundamentals",
     tagline: "Most In-Demand Tech Skill",
     titleLine1: "Cloud Computing",
+    heroInitials: "CC",
     titleLine2: "Build. Deploy. Scale. Anywhere.",
     description:
       "Learn to design, deploy and manage scalable applications on leading cloud platforms. Master AWS, Azure, DevOps, Containers and Infrastructure as Code with real-world projects.",
