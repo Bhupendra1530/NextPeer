@@ -64,9 +64,27 @@ export default async function ProgramDetailPage({
   if (!detail || !program) {
     notFound();
   }
-
+  
+const courseSchema = {
+  "@context": "https://schema.org",
+  "@type": "Course",
+  name: program.title,
+  description: `Learn ${program.title} with NextPeer through practical training, hands-on projects and career-focused learning.`,
+  url: `https://nextpeer.in/programs/${program.slug}`,
+  provider: {
+    "@type": "Organization",
+    name: "NextPeer",
+    sameAs: "https://nextpeer.in",
+  },
+};
   return (
     <>
+     <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(courseSchema),
+  }}
+/>
       <Header />
       <main>
         <DetailHero p={detail} />
