@@ -90,12 +90,46 @@ export default async function BlogPostPage({ params }: Props) {
           )}
 
           <div className="prose prose-lg max-w-none">
-            <p>
-              This article is part of NextPeer&apos;s learning resources for
-              college students. More detailed content, practical examples and
-              career guidance will be added here.
-            </p>
-          </div>
+  {post.content ? (
+    post.content.split("\n").map((line, index) => {
+      const trimmed = line.trim();
+
+      if (!trimmed) {
+        return null;
+      }
+
+      if (trimmed.startsWith("## ")) {
+        return (
+          <h2
+            key={index}
+            className="mt-10 mb-4 text-2xl font-bold tracking-tight"
+          >
+            {trimmed.replace("## ", "")}
+          </h2>
+        );
+      }
+
+      if (/^\d+\.\s/.test(trimmed)) {
+        return (
+          <p key={index} className="ml-4 mb-2">
+            {trimmed}
+          </p>
+        );
+      }
+
+      return (
+        <p key={index} className="mb-5 leading-8 text-gray-700">
+          {trimmed}
+        </p>
+      );
+    })
+  ) : (
+    <p>
+      More detailed content and practical learning resources will be
+      added soon.
+    </p>
+  )}
+</div>
         </article>
       </main>
 
