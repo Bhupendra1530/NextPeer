@@ -8,9 +8,12 @@ import LatestArticles from "@/components/sections/blog/LatestArticles";
 import NewsletterCTA from "@/components/sections/blog/NewsletterCTA";
 
 export const metadata: Metadata = {
-  title: "Blog | NextPeer",
+  title: "NextPeer Blog | AI, Tech Careers & Interview Preparation",
   description:
-    "Actionable insights on programming, AI, career growth, interview preparation, and industry trends from the mentors at NextPeer.",
+    "Explore NextPeer articles on AI, programming, career growth, interview preparation and technology trends to help college students build job-ready skills.",
+  alternates: {
+    canonical: "https://nextpeer.in/blog",
+  },
 };
 
 export default function BlogPage() {
