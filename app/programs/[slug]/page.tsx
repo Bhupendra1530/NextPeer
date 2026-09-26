@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -14,6 +15,41 @@ import { FaqSection, DetailCTA } from "@/components/sections/program-detail/FaqA
 
 export function generateStaticParams() {
   return PROGRAMS.map((prog) => ({ slug: prog.slug }));
+}  
+const siteUrl = "https://nextpeer.in";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+
+  const program = PROGRAMS.find((prog) => prog.slug === slug);
+
+  if (!program) {
+    return {};
+  }
+
+  const title = `${program.title} Course for College Students`;
+
+  const description =
+    `Learn ${program.title} with NextPeer through practical training, hands-on projects and career-focused learning designed for college students.`;
+
+  return {
+    title,
+    description,
+
+    alternates: {
+      canonical: `${siteUrl}/programs/${program.slug}`,
+    },
+
+    openGraph: {
+      title: `${title} | NextPeer`,
+      description,
+      url: `${siteUrl}/programs/${program.slug}`,
+      type: "website",
+    },
+  };
 }
 
 export default async function ProgramDetailPage({
