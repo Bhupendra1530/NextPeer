@@ -49,3 +49,4 @@ const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
 }));
 
 return [...staticPages, ...programPages, ...blogPages];
+}
