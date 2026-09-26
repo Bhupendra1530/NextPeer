@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { PROGRAMS } from "@/data/programs";
 
 const siteUrl = "https://nextpeer.in";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
       lastModified: new Date(),
@@ -29,4 +30,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
   ];
+
+  const programPages: MetadataRoute.Sitemap = PROGRAMS.map((program) => ({
+    url: `${siteUrl}/programs/${program.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...programPages];
 }
