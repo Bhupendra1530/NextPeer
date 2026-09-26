@@ -118,6 +118,7 @@ export interface FeaturedPost {
   excerpt: string;
   tags: string[];
   readTime: string;
+  content?: string;
 }
 
 export interface TrendingTopic {
