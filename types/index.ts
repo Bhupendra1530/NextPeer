@@ -108,7 +108,8 @@ export interface BlogPost {
   excerpt: string;
   gradient: string;
   icon: LucideIcon;
-  readTime: string;
+    readTime: string;
+  content?: string;
 }
 
 export interface FeaturedPost {
