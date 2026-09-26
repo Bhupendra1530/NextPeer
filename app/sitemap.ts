@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { PROGRAMS } from "@/data/programs";
+import { FEATURED_POST, LATEST_ARTICLES } from "@/data/blog";
 
 const siteUrl = "https://nextpeer.in";
 
@@ -38,5 +39,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...programPages];
-}
+  const blogPosts = [FEATURED_POST, ...LATEST_ARTICLES];
+
+const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+  url: `${siteUrl}/blog/${post.slug}`,
+  lastModified: new Date(),
+  changeFrequency: "monthly",
+  priority: 0.7,
+}));
+
+return [...staticPages, ...programPages, ...blogPages];
