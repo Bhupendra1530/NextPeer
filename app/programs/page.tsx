@@ -6,9 +6,12 @@ import ProgramsExplorer from "@/components/sections/programs/ProgramsExplorer";
 import ProgramsTrustBar from "@/components/sections/programs/ProgramsTrustBar";
 
 export const metadata: Metadata = {
-  title: "Programs | NextPeer",
+  title: "Career-Focused Courses for College Students | NextPeer",
   description:
-    "Explore career-focused programs designed to help college students build skills, gain practical knowledge and get placed.",
+    "Explore NextPeer courses in AI, Machine Learning, Cloud Computing and more. Build job-ready skills through practical training, real-world projects, mentorship and career support.",
+  alternates: {
+    canonical: "https://nextpeer.in/programs",
+  },
 };
 
 export default function ProgramsPage() {
