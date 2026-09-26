@@ -10,9 +10,12 @@ import OurCommitment from "@/components/sections/about/OurCommitment";
 import AboutCTA from "@/components/sections/about/AboutCTA";
 
 export const metadata: Metadata = {
-  title: "About Us | NextPeer",
+  title: "About NextPeer | Career-Focused Learning for College Students",
   description:
-    "Learn about NextPeer's mission, vision, and commitment to helping college students build skills, gain practical knowledge and get placed.",
+    "Learn about NextPeer's mission to help college students build job-ready skills through practical training, real-world projects, mentorship and career support.",
+  alternates: {
+    canonical: "https://nextpeer.in/about",
+  },
 };
 
 export default function AboutPage() {
