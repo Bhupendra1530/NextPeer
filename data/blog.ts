@@ -54,7 +54,7 @@ export const LATEST_ARTICLES: BlogPost[] = [
     slug: "why-dsa-still-matters-in-the-ai-era",
     number: 1,
     title: "Is DSA Still Important in the AI Era? 2026 Guide",
-    excerpt: "Master problem-solving skills that every software company looks for.",
+    excerpt: "Is DSA still important in the AI era? Learn why DSA matters in 2026 for coding interviews, problem-solving, software engineering and placements.",
     gradient: "from-indigo-950 via-purple-950 to-slate-900",
     icon: Brain,
     readTime: "8 min read",
