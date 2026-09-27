@@ -818,26 +818,14 @@ export default function CourseLearningPage() {
                                         Completed
                                       </span>
                                     ) : unlocked ? (
-                                      <button
-                                        type="button"
-                                        disabled={updating}
-                                        onClick={() =>
-                                          markLessonComplete(
-                                            lesson
-                                          )
-                                        }
-                                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                                      >
-                                        {updating
-                                          ? "Saving..."
-                                          : "Mark Complete"}
+                                     <Link
+  href={`/learn/${courseId}/lesson/${lesson.id}`}
+  className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
+>
+  Start Lesson
 
-                                        {!updating && (
-                                          <ChevronRight
-                                            size={15}
-                                          />
-                                        )}
-                                      </button>
+  <ChevronRight size={15} />
+</Link>
                                     ) : (
                                       <span className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-400">
                                         <Lock size={14} />
