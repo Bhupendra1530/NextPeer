@@ -15,8 +15,28 @@ export const metadata: Metadata = {
 };
 
 export default function ProgramsPage() {
+ const programsSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Career-Focused Courses for College Students",
+  description:
+    "Explore NextPeer courses in AI, Machine Learning, Cloud Computing and other career-focused skills for college students.",
+  url: "https://nextpeer.in/programs",
+  isPartOf: {
+    "@type": "WebSite",
+    name: "NextPeer",
+    url: "https://nextpeer.in",
+  },
+}; 
+  
   return (
     <>
+     <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(programsSchema),
+  }}
+/> 
       <Header />
       <main>
         <ProgramsHero />
