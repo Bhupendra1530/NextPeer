@@ -284,17 +284,38 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
       { number: 7, label: "Placement Support", icon: UserCheck },
       { number: 8, label: "Certification", icon: Award },
     ],
-    faqs: [
-      { question: "Do I need prior experience?", answer: "No. Basic knowledge of computers is enough. We start from scratch." },
-      { question: "Will I get a certificate?", answer: "Yes, you'll receive a verifiable NextPeer Cloud Computing Certificate." },
-      { question: "Will I get hands-on experience?", answer: "Yes, you will work on real cloud projects and hands-on labs." },
-      { question: "Is placement assistance included?", answer: "Yes, we provide resume building, mock interviews and placement support." },
-      { question: "Which platform is best to learn?", answer: "We cover AWS, Azure and GCP so you can choose what fits you best." },
-      { question: "How long is the course?", answer: "The course duration is 3 to 6 months depending on the batch." },
+       faqs: [
+      {
+        question: "Do I need prior experience?",
+        answer:
+          "No. Basic knowledge of computers is enough. We start from scratch.",
+      },
+      {
+        question: "Will I get a certificate?",
+        answer:
+          "Yes, you'll receive a verifiable NextPeer Cloud Computing Certificate.",
+      },
+      {
+        question: "Will I get hands-on experience?",
+        answer:
+          "Yes, you will work on real cloud projects and hands-on labs.",
+      },
+      {
+        question: "Is placement assistance included?",
+        answer:
+          "Yes, we provide resume building, mock interviews and placement support.",
+      },
+      {
+        question: "Which platform is best to learn?",
+        answer:
+          "We cover AWS, Azure and GCP so you can choose what fits you best.",
+      },
+      {
+        question: "How long is the course?",
+        answer:
+          "The course duration is 3 to 6 months depending on the batch.",
+      },
     ],
-  },
-};
-
   },
 
   "full-stack-web-development": {
