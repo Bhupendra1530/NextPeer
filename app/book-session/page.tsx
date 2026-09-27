@@ -53,42 +53,6 @@ export default function BookSessionPage() {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    setLoading(true);
-    setError("");
-
-    const { error } = await supabase
-      .from("counselling_bookings")
-      .insert([
-        {
-          full_name: form.full_name.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          college_name: form.college_name.trim() || null,
-          current_year: form.current_year || null,
-          program_name: form.program_name,
-          preferred_date: form.preferred_date,
-          preferred_time: form.preferred_time,
-          message: form.message.trim() || null,
-          status: "new",
-        },
-      ]);
-
-    if (error) {
-      console.error(error);
-      setError(
-        "We couldn't book your session. Please try again in a moment."
-      );
-      setLoading(false);
-      return;
-    }
-
-    setSuccess(true);
-    setLoading(false);
-  };
-
   if (success) {
     return (
       <main className="min-h-screen bg-slate-50">
