@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -12,6 +13,8 @@ import {
 import { supabase } from "@/lib/supabase";
 
 export default function SignupPage() {
+  const router = useRouter();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -20,13 +23,11 @@ export default function SignupPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError("");
-    setSuccess("");
 
     if (!agreed) {
       setError(
@@ -60,15 +61,16 @@ export default function SignupPage() {
       return;
     }
 
+    // If email confirmation is disabled and Supabase creates a session,
+    // take the student directly to the homepage.
     if (data.session) {
-      setSuccess("Account created successfully! You can now continue.");
-    } else {
-      setSuccess(
-        "Account created! Please check your email and verify your account before logging in."
-      );
+      router.push("/");
+      router.refresh();
+      return;
     }
 
-    setLoading(false);
+    // If email verification is required, show our NextPeer verification page.
+    router.push("/verify-email");
   };
 
   return (
@@ -245,15 +247,6 @@ export default function SignupPage() {
                 </div>
               )}
 
-              {/* Success */}
-              {success && (
-                <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-                  <p className="text-sm font-medium text-green-700">
-                    {success}
-                  </p>
-                </div>
-              )}
-
               {/* Submit */}
               <button
                 type="submit"
@@ -275,7 +268,7 @@ export default function SignupPage() {
               <div className="h-px flex-1 bg-slate-200" />
             </div>
 
-            {/* Google - UI only for now */}
+            {/* Google - we'll connect this later */}
             <button
               type="button"
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50"
