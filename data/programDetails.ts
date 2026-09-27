@@ -60,7 +60,7 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
     heroInitials: "AI",
     titleLine2: "Course for College Students",
     description:
-      "Master AI through hands-on projects, real-world case studies, and industry mentorship. Learn to build intelligent systems using Python, ML, Deep Learning, NLP and Generative AI.",
+       "Learn Artificial Intelligence through hands-on projects, real-world case studies, and industry mentorship. Designed for college students to build practical skills in Python, Machine Learning, Deep Learning, NLP, and Generative AI.",
     heroBadges: [
       { icon: Code2, label: "Python", key: "python" },
       { icon: Sigma, label: "TensorFlow", key: "tensorflow" },
