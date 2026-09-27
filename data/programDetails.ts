@@ -58,7 +58,7 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
     tagline: "Most In-Demand Skill of the Future",
     titleLine1: "Artificial Intelligence",
     heroInitials: "AI",
-    titleLine2: "Build the Future with AI",
+    titleLine2: "Course for College Students",
     description:
       "Master AI through hands-on projects, real-world case studies, and industry mentorship. Learn to build intelligent systems using Python, ML, Deep Learning, NLP and Generative AI.",
     heroBadges: [
