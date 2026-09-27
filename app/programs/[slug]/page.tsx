@@ -32,8 +32,8 @@ export async function generateMetadata({
 
   const title = `${program.title} Course for College Students | NextPeer`;
 
-  const description =
-    `Learn ${program.title} with NextPeer through practical training, hands-on projects and career-focused learning designed for college students.`;
+const description =
+  `Learn ${program.title} with NextPeer. A practical course for college students featuring hands-on projects, industry-relevant skills and career-focused training.`;
 
   return {
     title,
