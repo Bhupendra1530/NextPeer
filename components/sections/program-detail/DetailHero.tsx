@@ -3,17 +3,19 @@ import { Send, PhoneCall, Sparkles } from "lucide-react";
 import type { ProgramDetail } from "@/types";
 import { TechTile } from "@/components/icons/TechIcons";
 
-export default function DetailHero({ p }: { p: ProgramDetail }) {
-  const bookingUrl = `/book-session?program=${encodeURIComponent(
-    p.titleLine1
-  )}`;
+export default function DetailHero({
+  p,
+  programSlug,
+}: {
+  p: ProgramDetail;
+  programSlug: string;
+}) {
+  const bookingUrl = `/book-session?program=${encodeURIComponent(programSlug)}`;
 
   return (
     <section className="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-center">
-          
-          {/* Left Content */}
           <div>
             <span className="inline-flex rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-600">
               {p.tagline}
@@ -23,15 +25,18 @@ export default function DetailHero({ p }: { p: ProgramDetail }) {
               <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 {p.titleLine1}
               </span>
+
               <br />
-              <span className="text-slate-900">{p.titleLine2}</span>
+
+              <span className="text-slate-900">
+                {p.titleLine2}
+              </span>
             </h1>
 
             <p className="mt-3 max-w-lg text-sm text-slate-600 sm:text-base">
               {p.description}
             </p>
 
-            {/* CTA Buttons */}
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/signup"
@@ -50,7 +55,6 @@ export default function DetailHero({ p }: { p: ProgramDetail }) {
               </Link>
             </div>
 
-            {/* Quick Highlights */}
             <div className="mt-6 grid grid-cols-3 gap-2 sm:grid-cols-6">
               {p.quickHighlights.map((h) => (
                 <div
@@ -63,10 +67,9 @@ export default function DetailHero({ p }: { p: ProgramDetail }) {
             </div>
           </div>
 
-          {/* Right Visual */}
+          {/* Right visual */}
           <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-2 lg:max-w-none">
             <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-500 via-purple-500 to-indigo-600 shadow-xl shadow-indigo-200">
-              
               <div
                 className="absolute inset-0 opacity-20"
                 style={{
@@ -88,7 +91,6 @@ export default function DetailHero({ p }: { p: ProgramDetail }) {
               </div>
             </div>
 
-            {/* Technology Badges */}
             <div className="flex flex-wrap justify-center gap-2.5">
               {p.heroBadges.map((b) => {
                 if (b.key) {
