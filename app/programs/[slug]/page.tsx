@@ -87,7 +87,7 @@ const courseSchema = {
 />
       <Header />
       <main>
-        <DetailHero p={detail} />
+        <DetailHero p={detail} programSlug={program.slug} />
         <WhyLearnStats p={detail} />
         <Curriculum p={detail} />
         <IndustryProjects p={detail} />
