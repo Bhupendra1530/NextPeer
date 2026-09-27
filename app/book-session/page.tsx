@@ -1,17 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const programs = [
-  "Artificial Intelligence & Data Science",
-  "Cloud Computing",
-  "Machine Learning with Python",
-  "Data Analytics",
-  "Cyber Security",
-  "Web Development",
-  "Other Program",
+  {
+    slug: "cloud-computing-fundamentals",
+    name: "Cloud Computing Fundamentals",
+  },
+  {
+    slug: "full-stack-web-development",
+    name: "Full Stack Web Development",
+  },
+  {
+    slug: "python-for-beginners-to-advanced",
+    name: "Python for Beginners to Advanced",
+  },
+  {
+    slug: "data-analytics-excel-power-bi",
+    name: "Data Analytics with Excel & Power BI",
+  },
+  {
+    slug: "machine-learning-with-python",
+    name: "Machine Learning with Python",
+  },
+  {
+    slug: "ui-ux-design-fundamentals",
+    name: "UI/UX Design Fundamentals",
+  },
+  {
+    slug: "digital-marketing-essentials",
+    name: "Digital Marketing Essentials",
+  },
+  {
+    slug: "artificial-intelligence-essentials",
+    name: "Artificial Intelligence Essentials",
+  },
+  {
+    slug: "other-program",
+    name: "Other Program",
+  },
 ];
 
 const timeSlots = [
@@ -25,6 +55,8 @@ const timeSlots = [
 ];
 
 export default function BookSessionPage() {
+  const searchParams = useSearchParams();
+
   const [form, setForm] = useState({
     full_name: "",
     email: "",
@@ -40,6 +72,29 @@ export default function BookSessionPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+
+  // ---------------------------------------------------------
+  // AUTO SELECT PROGRAM FROM URL
+  // Example:
+  // /book-session?program=cloud-computing-fundamentals
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    const programSlug = searchParams.get("program");
+
+    if (!programSlug) return;
+
+    const selectedProgram = programs.find(
+      (program) => program.slug === programSlug
+    );
+
+    if (selectedProgram) {
+      setForm((currentForm) => ({
+        ...currentForm,
+        program_name: selectedProgram.name,
+      }));
+    }
+  }, [searchParams]);
 
   const handleChange = (
     e:
@@ -121,8 +176,8 @@ export default function BookSessionPage() {
           }),
         });
       } catch (googleSheetError) {
-        // Supabase already has the booking,
-        // so don't show the student a failed booking.
+        // Supabase already contains the booking,
+        // so we don't show the student a failed booking.
         console.error("Google Sheets error:", googleSheetError);
       }
 
@@ -201,7 +256,7 @@ export default function BookSessionPage() {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      {/* Header */}
+      {/* HEADER */}
 
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
@@ -370,8 +425,8 @@ export default function BookSessionPage() {
                 <option value="">Select program</option>
 
                 {programs.map((program) => (
-                  <option key={program} value={program}>
-                    {program}
+                  <option key={program.slug} value={program.name}>
+                    {program.name}
                   </option>
                 ))}
               </Select>
