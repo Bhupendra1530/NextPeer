@@ -13,36 +13,153 @@ import {
   Target,
   UserRound,
   Zap,
+  Clock,
+  GraduationCap,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+
+type Course = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  thumbnail_url: string | null;
+  duration: string | null;
+  level: string | null;
+  price: number | null;
+};
+
+type Enrollment = {
+  id: string;
+  status: string;
+  enrolled_at: string;
+  completed_at: string | null;
+  course: Course | null;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
 
   const [user, setUser] = useState<User | null>(null);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [certificateCount, setCertificateCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState("");
 
   useEffect(() => {
-    const loadUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    let mounted = true;
 
-      if (!user) {
-        router.replace("/login");
-        return;
+    const loadDashboard = async () => {
+      try {
+        setDashboardError("");
+
+        // Get logged-in user
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError) {
+          console.error("User error:", userError);
+        }
+
+        if (!user) {
+          router.replace("/login");
+          return;
+        }
+
+        if (!mounted) return;
+
+        setUser(user);
+
+        // Get this student's enrollments + course information
+        const { data: enrollmentData, error: enrollmentError } =
+          await supabase
+            .from("enrollments")
+            .select(`
+              id,
+              status,
+              enrolled_at,
+              completed_at,
+              course:courses (
+                id,
+                title,
+                slug,
+                description,
+                thumbnail_url,
+                duration,
+                level,
+                price
+              )
+            `)
+            .eq("user_id", user.id)
+            .order("enrolled_at", { ascending: false });
+
+        if (enrollmentError) {
+          console.error("Enrollment error:", enrollmentError);
+
+          if (mounted) {
+            setDashboardError(
+              "We couldn't load your enrolled courses. Please refresh the page."
+            );
+          }
+        } else if (mounted) {
+          setEnrollments((enrollmentData ?? []) as unknown as Enrollment[]);
+        }
+
+        // Get student's certificate count
+        const { count, error: certificateError } = await supabase
+          .from("certificates")
+          .select("*", {
+            count: "exact",
+            head: true,
+          })
+          .eq("user_id", user.id);
+
+        if (certificateError) {
+          console.error("Certificate error:", certificateError);
+        } else if (mounted) {
+          setCertificateCount(count ?? 0);
+        }
+      } catch (error) {
+        console.error("Dashboard error:", error);
+
+        if (mounted) {
+          setDashboardError(
+            "Something went wrong while loading your dashboard."
+          );
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
-
-      setUser(user);
-      setLoading(false);
     };
 
-    loadUser();
+    loadDashboard();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!mounted) return;
+
+      if (event === "SIGNED_OUT" || !session) {
+        setUser(null);
+        router.replace("/login");
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [router]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+
+    setUser(null);
     router.push("/");
     router.refresh();
   };
@@ -52,6 +169,7 @@ export default function DashboardPage() {
       <main className="flex min-h-screen items-center justify-center bg-slate-50">
         <div className="text-center">
           <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+
           <p className="text-sm font-medium text-slate-500">
             Loading your NextPeer dashboard...
           </p>
@@ -60,12 +178,24 @@ export default function DashboardPage() {
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   const fullName =
-    user?.user_metadata?.full_name ||
-    user?.email?.split("@")[0] ||
+    user.user_metadata?.full_name ||
+    user.email?.split("@")[0] ||
     "Student";
 
   const firstName = fullName.split(" ")[0];
+
+  const activeEnrollments = enrollments.filter(
+    (enrollment) => enrollment.status === "active"
+  );
+
+  const completedEnrollments = enrollments.filter(
+    (enrollment) => enrollment.status === "completed"
+  );
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -79,12 +209,14 @@ export default function DashboardPage() {
               width={120}
               height={40}
               className="h-9 w-auto object-contain"
+              priority
             />
 
             <div className="leading-tight">
               <p className="font-bold text-slate-900">
                 Next<span className="text-blue-600">Peer</span>
               </p>
+
               <p className="text-[10px] text-slate-400">
                 Student Dashboard
               </p>
@@ -96,14 +228,19 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-slate-800">
                 {fullName}
               </p>
+
               <p className="max-w-[180px] truncate text-xs text-slate-400">
-                {user?.email}
+                {user.email}
               </p>
             </div>
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
+            <Link
+              href="/profile"
+              title="My Profile"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white transition hover:bg-blue-700"
+            >
               {firstName.charAt(0).toUpperCase()}
-            </div>
+            </Link>
 
             <button
               type="button"
@@ -134,12 +271,12 @@ export default function DashboardPage() {
             </h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-              Welcome to your NextPeer dashboard. Your courses, projects,
-              progress and certificates will live here.
+              Welcome to your NextPeer dashboard. Continue learning, build
+              projects, track your progress and earn certificates.
             </p>
 
             <Link
-              href="/courses"
+              href="/programs"
               className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
             >
               Explore Programs
@@ -148,32 +285,41 @@ export default function DashboardPage() {
           </div>
         </section>
 
+        {/* Error */}
+        {dashboardError && (
+          <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+            {dashboardError}
+          </div>
+        )}
+
         {/* Stats */}
         <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <DashboardStat
             icon={<BookOpen size={22} />}
             title="My Courses"
-            value="0 Active"
-            description="Your enrolled programs"
+            value={`${activeEnrollments.length} Active`}
+            description={`${enrollments.length} total enrollment${
+              enrollments.length === 1 ? "" : "s"
+            }`}
           />
 
           <DashboardStat
             icon={<Award size={22} />}
             title="Certificates"
-            value="0 Earned"
+            value={`${certificateCount} Earned`}
             description="Your achievements"
           />
 
           <DashboardStat
             icon={<Target size={22} />}
-            title="Learning Progress"
-            value="Start learning"
-            description="Build your first skill"
+            title="Completed Programs"
+            value={`${completedEnrollments.length} Completed`}
+            description="Keep building your skills"
           />
         </section>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-          {/* Continue Learning */}
+          {/* My Courses */}
           <section className="rounded-3xl border border-slate-200 bg-white p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -182,36 +328,115 @@ export default function DashboardPage() {
                 </p>
 
                 <h2 className="mt-1 text-xl font-bold text-slate-900">
-                  Continue Learning
+                  My Courses
                 </h2>
               </div>
 
               <BookOpen className="text-blue-600" size={24} />
             </div>
 
-            {/* Empty state */}
-            <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                <Rocket size={25} />
+            {enrollments.length === 0 ? (
+              <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                  <Rocket size={25} />
+                </div>
+
+                <h3 className="mt-4 font-bold text-slate-900">
+                  Your journey starts here
+                </h3>
+
+                <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500">
+                  You haven't enrolled in a program yet. Explore NextPeer
+                  programs and start building real-world skills.
+                </p>
+
+                <Link
+                  href="/programs"
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700"
+                >
+                  Browse Programs
+                  <ArrowRight size={16} />
+                </Link>
               </div>
+            ) : (
+              <div className="mt-6 space-y-4">
+                {enrollments.map((enrollment) => {
+                  const course = enrollment.course;
 
-              <h3 className="mt-4 font-bold text-slate-900">
-                Your journey starts here
-              </h3>
+                  if (!course) return null;
 
-              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500">
-                You haven't enrolled in a program yet. Explore NextPeer
-                programs and start building real-world skills.
-              </p>
+                  return (
+                    <div
+                      key={enrollment.id}
+                      className="overflow-hidden rounded-2xl border border-slate-200 transition hover:border-blue-200 hover:shadow-sm"
+                    >
+                      <div className="p-5 sm:p-6">
+                        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-3 flex flex-wrap items-center gap-2">
+                              <span
+                                className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
+                                  enrollment.status === "completed"
+                                    ? "bg-green-50 text-green-700"
+                                    : enrollment.status === "cancelled"
+                                    ? "bg-red-50 text-red-600"
+                                    : "bg-blue-50 text-blue-700"
+                                }`}
+                              >
+                                {enrollment.status}
+                              </span>
 
-              <Link
-                href="/courses"
-                className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700"
-              >
-                Browse Programs
-                <ArrowRight size={16} />
-              </Link>
-            </div>
+                              {course.level && (
+                                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                                  {course.level}
+                                </span>
+                              )}
+                            </div>
+
+                            <h3 className="text-lg font-extrabold text-slate-900">
+                              {course.title}
+                            </h3>
+
+                            {course.description && (
+                              <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">
+                                {course.description}
+                              </p>
+                            )}
+
+                            <div className="mt-4 flex flex-wrap gap-4 text-xs font-medium text-slate-500">
+                              {course.duration && (
+                                <span className="flex items-center gap-1.5">
+                                  <Clock size={15} />
+                                  {course.duration}
+                                </span>
+                              )}
+
+                              <span className="flex items-center gap-1.5">
+                                <GraduationCap size={15} />
+                                NextPeer Program
+                              </span>
+                            </div>
+                          </div>
+
+                          {enrollment.status !== "cancelled" && (
+                            <Link
+                              href={`/learn/${course.slug}`}
+                              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
+                            >
+                              {enrollment.status === "completed"
+                                ? "Review Course"
+                                : "Continue Learning"}
+
+                              <ArrowRight size={16} />
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
 
           {/* Quick Actions */}
@@ -226,7 +451,7 @@ export default function DashboardPage() {
 
             <div className="mt-5 space-y-3">
               <QuickAction
-                href="/courses"
+                href="/programs"
                 icon={<BookOpen size={19} />}
                 title="Explore Programs"
                 description="Discover what to learn next"
@@ -261,7 +486,7 @@ export default function DashboardPage() {
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              Your dashboard will track your journey as you complete courses,
+              Your dashboard tracks your journey as you complete courses,
               build projects, finish assessments and earn certificates.
             </p>
           </div>
