@@ -9,7 +9,7 @@ import {
   Building2,
   CalendarDays,
   CheckCircle2,
-  Linkedin,
+  Link as LinkIcon,
   Mail,
   Phone,
   Save,
@@ -285,7 +285,7 @@ export default function ProfilePage() {
               {/* LinkedIn */}
               <ProfileField
                 label="LinkedIn profile"
-                icon={<Linkedin size={18} />}
+                icon={<LinkIcon size={18} />}
               >
                 <input
                   type="url"
@@ -321,7 +321,6 @@ export default function ProfilePage() {
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
                 <Save size={17} />
-
                 {saving ? "Saving..." : "Save Profile"}
               </button>
             </form>
