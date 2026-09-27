@@ -31,7 +31,7 @@ export default function BookSessionPage() {
     phone: "",
     college_name: "",
     current_year: "",
-   program_name: "",
+    program_name: "",
     preferred_date: "",
     preferred_time: "",
     message: "",
@@ -53,12 +53,101 @@ export default function BookSessionPage() {
     });
   };
 
+  // ---------------------------------------------------------
+  // BOOK SESSION
+  // Saves booking to:
+  // 1. Supabase
+  // 2. Google Sheets through Google Apps Script
+  // ---------------------------------------------------------
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // STEP 1: Save booking in Supabase
+      const { error: supabaseError } = await supabase
+        .from("counselling_bookings")
+        .insert([
+          {
+            full_name: form.full_name.trim(),
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            college_name: form.college_name.trim() || null,
+            current_year: form.current_year || null,
+            program_name: form.program_name,
+            preferred_date: form.preferred_date,
+            preferred_time: form.preferred_time,
+            message: form.message.trim() || null,
+            status: "new",
+          },
+        ]);
+
+      if (supabaseError) {
+        console.error("Supabase error:", supabaseError);
+
+        setError(
+          "We couldn't book your session. Please try again in a moment."
+        );
+
+        return;
+      }
+
+      // STEP 2: Send booking to Google Sheets
+      const googleScriptUrl =
+        "https://script.google.com/macros/s/AKfycbzM1A-H-cRpvlHh6RGET3NJJfQufSfsnMOaVXjHbcOatkCa49VuSAkXuuZ3HrAywshp/exec";
+
+      try {
+        await fetch(googleScriptUrl, {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+
+          body: JSON.stringify({
+            full_name: form.full_name.trim(),
+            phone: form.phone.trim(),
+            email: form.email.trim(),
+            college_name: form.college_name.trim(),
+            current_year: form.current_year,
+            program_name: form.program_name,
+            preferred_date: form.preferred_date,
+            preferred_time: form.preferred_time,
+            message: form.message.trim(),
+            status: "new",
+          }),
+        });
+      } catch (googleSheetError) {
+        // Supabase already has the booking,
+        // so don't show the student a failed booking.
+        console.error("Google Sheets error:", googleSheetError);
+      }
+
+      // STEP 3: Show confirmation screen
+      setSuccess(true);
+    } catch (err) {
+      console.error("Booking error:", err);
+
+      setError(
+        "We couldn't book your session. Please try again in a moment."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ---------------------------------------------------------
+  // SUCCESS SCREEN
+  // ---------------------------------------------------------
+
   if (success) {
     return (
       <main className="min-h-screen bg-slate-50">
         <div className="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
           <div className="w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm md:p-12">
-
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
               ✓
             </div>
@@ -72,23 +161,18 @@ export default function BookSessionPage() {
             </h1>
 
             <p className="mx-auto mt-5 max-w-xl text-slate-600">
-              Thank you, {form.full_name}. The NextPeer team has received
-              your request for{" "}
-              <strong>{form.program_name}</strong>.
+              Thank you, {form.full_name}. The NextPeer team has received your
+              request for <strong>{form.program_name}</strong>.
             </p>
 
             <div className="mx-auto mt-8 max-w-md rounded-2xl bg-slate-50 p-6 text-left">
-              <p className="text-sm text-slate-500">
-                Preferred date
-              </p>
+              <p className="text-sm text-slate-500">Preferred date</p>
 
               <p className="mt-1 font-semibold text-slate-900">
                 {form.preferred_date}
               </p>
 
-              <p className="mt-4 text-sm text-slate-500">
-                Preferred time
-              </p>
+              <p className="mt-4 text-sm text-slate-500">Preferred time</p>
 
               <p className="mt-1 font-semibold text-slate-900">
                 {form.preferred_time}
@@ -111,21 +195,23 @@ export default function BookSessionPage() {
     );
   }
 
+  // ---------------------------------------------------------
+  // BOOKING PAGE
+  // ---------------------------------------------------------
+
   return (
     <main className="min-h-screen bg-slate-50">
-
       {/* Header */}
 
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-
-        <Link href="/" className="flex items-center">
-  <img
-    src="/logo.png"
-    alt="NextPeer"
-    className="h-12 w-auto object-contain"
-  />
-</Link>
+          <Link href="/" className="flex items-center">
+            <img
+              src="/logo.png"
+              alt="NextPeer"
+              className="h-12 w-auto object-contain"
+            />
+          </Link>
 
           <Link
             href="/programs"
@@ -133,16 +219,13 @@ export default function BookSessionPage() {
           >
             ← Back to Programs
           </Link>
-
         </div>
       </header>
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-[0.9fr_1.1fr] lg:py-20">
-
         {/* LEFT SIDE */}
 
         <div className="lg:pt-8">
-
           <div className="inline-flex rounded-full bg-blue-100 px-4 py-2 text-xs font-bold uppercase tracking-wider text-blue-700">
             Free Career Counselling
           </div>
@@ -155,13 +238,12 @@ export default function BookSessionPage() {
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-            Speak with the NextPeer team and understand the program,
-            learning roadmap, live training, projects and career support
-            that fits your goals.
+            Speak with the NextPeer team and understand the program, learning
+            roadmap, live training, projects and career support that fits your
+            goals.
           </p>
 
           <div className="mt-10 space-y-5">
-
             <Feature
               number="01"
               title="Personalised Guidance"
@@ -185,7 +267,6 @@ export default function BookSessionPage() {
               title="Ask Your Questions"
               description="Discuss training, projects, certification and career assistance directly with our team."
             />
-
           </div>
 
           <div className="mt-10 rounded-2xl bg-slate-950 p-6 text-white">
@@ -198,19 +279,16 @@ export default function BookSessionPage() {
             </h3>
 
             <p className="mt-2 text-sm leading-6 text-slate-300">
-              Live instructor-led learning with practical projects designed
-              to help students build industry-relevant skills.
+              Live instructor-led learning with practical projects designed to
+              help students build industry-relevant skills.
             </p>
           </div>
-
         </div>
 
         {/* FORM */}
 
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/50 md:p-9">
-
           <div className="mb-8">
-
             <p className="text-sm font-bold uppercase tracking-wider text-blue-600">
               Book your session
             </p>
@@ -222,13 +300,10 @@ export default function BookSessionPage() {
             <p className="mt-3 text-slate-500">
               Fill in your details and select your preferred date and time.
             </p>
-
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
             <div className="grid gap-5 md:grid-cols-2">
-
               <Input
                 label="Full Name"
                 name="full_name"
@@ -247,7 +322,6 @@ export default function BookSessionPage() {
                 placeholder="+91 98765 43210"
                 required
               />
-
             </div>
 
             <Input
@@ -269,7 +343,6 @@ export default function BookSessionPage() {
             />
 
             <div className="grid gap-5 md:grid-cols-2">
-
               <Select
                 label="Current Year"
                 name="current_year"
@@ -301,13 +374,10 @@ export default function BookSessionPage() {
                     {program}
                   </option>
                 ))}
-
               </Select>
-
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
-
               <Input
                 label="Preferred Date"
                 name="preferred_date"
@@ -332,13 +402,10 @@ export default function BookSessionPage() {
                     {time}
                   </option>
                 ))}
-
               </Select>
-
             </div>
 
             <div>
-
               <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Anything you'd like to discuss?
               </label>
@@ -351,7 +418,6 @@ export default function BookSessionPage() {
                 placeholder="Tell us about your career goals or questions..."
                 className="w-full resize-none rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
               />
-
             </div>
 
             {error && (
@@ -374,16 +440,16 @@ export default function BookSessionPage() {
               By submitting this form, you agree to be contacted by the
               NextPeer team regarding your counselling session.
             </p>
-
           </form>
-
         </div>
-
       </section>
-
     </main>
   );
 }
+
+// ---------------------------------------------------------
+// FEATURE COMPONENT
+// ---------------------------------------------------------
 
 function Feature({
   number,
@@ -396,7 +462,6 @@ function Feature({
 }) {
   return (
     <div className="flex gap-4">
-
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-sm font-bold text-blue-700">
         {number}
       </div>
@@ -408,10 +473,13 @@ function Feature({
           {description}
         </p>
       </div>
-
     </div>
   );
 }
+
+// ---------------------------------------------------------
+// INPUT COMPONENT
+// ---------------------------------------------------------
 
 function Input({
   label,
@@ -421,7 +489,6 @@ function Input({
 }) {
   return (
     <div>
-
       <label className="mb-2 block text-sm font-semibold text-slate-700">
         {label}
       </label>
@@ -430,10 +497,13 @@ function Input({
         {...props}
         className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
       />
-
     </div>
   );
 }
+
+// ---------------------------------------------------------
+// SELECT COMPONENT
+// ---------------------------------------------------------
 
 function Select({
   label,
@@ -445,7 +515,6 @@ function Select({
 }) {
   return (
     <div>
-
       <label className="mb-2 block text-sm font-semibold text-slate-700">
         {label}
       </label>
@@ -456,7 +525,6 @@ function Select({
       >
         {children}
       </select>
-
     </div>
   );
 }
