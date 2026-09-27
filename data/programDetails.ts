@@ -295,4 +295,361 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
   },
 };
 
+  },
+
+  "full-stack-web-development": {
+    slug: "full-stack-web-development",
+    tagline: "Build Modern Web Applications",
+    titleLine1: "Full Stack Web Development",
+    heroInitials: "FS",
+    titleLine2: "Frontend. Backend. Database. Deployment.",
+    description:
+      "Learn full stack web development through live training, hands-on coding and practical projects. Build modern web applications using HTML, CSS, JavaScript, React, Node.js, Express, MongoDB and deployment tools.",
+
+    heroBadges: [
+      { icon: Globe, label: "Web Development" },
+      { icon: Code2, label: "JavaScript" },
+      { icon: Layers, label: "React" },
+      { icon: Server, label: "Node.js" },
+      { icon: Database, label: "MongoDB" },
+    ],
+
+    quickHighlights: [
+      "Live Online Training",
+      "Industry Experts",
+      "2 Live Projects",
+      "Hands-on Coding",
+      "Placement Assistance",
+      "Certificate from NextPeer",
+    ],
+
+    whyLearnTitle: "Why Learn Full Stack Development?",
+
+    whyLearnDescription:
+      "Full stack development helps you understand how complete web applications are built — from user interfaces and APIs to databases and deployment. These skills are useful across startups, software companies and product teams.",
+
+    whyLearnStats: [
+      {
+        icon: Globe,
+        value: "Frontend",
+        label: "Build Responsive User Interfaces",
+      },
+      {
+        icon: Server,
+        value: "Backend",
+        label: "Build APIs & Server Applications",
+      },
+      {
+        icon: Database,
+        value: "Database",
+        label: "Store & Manage Application Data",
+      },
+      {
+        icon: Rocket,
+        value: "Deploy",
+        label: "Launch Applications Online",
+      },
+    ],
+
+    curriculum: [
+      {
+        number: "01",
+        icon: Globe,
+        title: "HTML & CSS Fundamentals",
+        topics: [
+          "HTML5",
+          "Semantic HTML",
+          "CSS Fundamentals",
+          "Flexbox",
+          "CSS Grid",
+          "Responsive Design",
+        ],
+      },
+      {
+        number: "02",
+        icon: Code2,
+        title: "JavaScript Programming",
+        topics: [
+          "Variables & Data Types",
+          "Functions",
+          "Arrays",
+          "Objects",
+          "DOM Manipulation",
+          "ES6+",
+        ],
+      },
+      {
+        number: "03",
+        icon: Layers,
+        title: "React Development",
+        topics: [
+          "React Fundamentals",
+          "Components",
+          "Props",
+          "State",
+          "Hooks",
+          "Routing",
+        ],
+      },
+      {
+        number: "04",
+        icon: Server,
+        title: "Node.js & Express",
+        topics: [
+          "Node.js Fundamentals",
+          "Express.js",
+          "REST APIs",
+          "Middleware",
+          "Routing",
+          "Error Handling",
+        ],
+      },
+      {
+        number: "05",
+        icon: Database,
+        title: "Database Development",
+        topics: [
+          "Database Fundamentals",
+          "MongoDB",
+          "Collections",
+          "CRUD Operations",
+          "Mongoose",
+          "Data Modelling",
+        ],
+      },
+      {
+        number: "06",
+        icon: ShieldCheck,
+        title: "Authentication & Security",
+        topics: [
+          "User Authentication",
+          "Authorization",
+          "JWT",
+          "Password Hashing",
+          "Protected Routes",
+          "Security Basics",
+        ],
+      },
+      {
+        number: "07",
+        icon: GitBranch,
+        title: "Git & GitHub",
+        topics: [
+          "Version Control",
+          "Git Commands",
+          "Repositories",
+          "Branches",
+          "Pull Requests",
+          "Team Collaboration",
+        ],
+      },
+      {
+        number: "08",
+        icon: Rocket,
+        title: "Deployment & Production",
+        topics: [
+          "Environment Variables",
+          "Frontend Deployment",
+          "Backend Deployment",
+          "Database Hosting",
+          "Production Builds",
+          "Project Deployment",
+        ],
+      },
+    ],
+
+    projects: [
+      {
+        icon: Globe,
+        title: "Responsive Portfolio Website",
+      },
+      {
+        icon: FolderKanban,
+        title: "Full Stack Project Management Application",
+      },
+      {
+        icon: Users,
+        title: "Authentication & User Management System",
+      },
+      {
+        icon: Database,
+        title: "CRUD Application with MongoDB",
+      },
+      {
+        icon: Briefcase,
+        title: "Job Portal Web Application",
+      },
+      {
+        icon: Rocket,
+        title: "Production Web App Deployment",
+      },
+    ],
+
+    tools: [
+      { icon: Globe, label: "HTML5" },
+      { icon: Layers, label: "CSS3" },
+      { icon: Code2, label: "JavaScript" },
+      { icon: Layers, label: "React" },
+      { icon: Server, label: "Node.js" },
+      { icon: Server, label: "Express.js" },
+      { icon: Database, label: "MongoDB" },
+      { icon: GitBranch, label: "Git" },
+      { icon: Code2, label: "GitHub", key: "github" },
+      { icon: Laptop, label: "VS Code", key: "vscode" },
+    ],
+
+    careerRoles: [
+      { label: "Frontend Developer" },
+      { label: "Backend Developer" },
+      { label: "Full Stack Developer" },
+      { label: "React Developer" },
+      { label: "Node.js Developer" },
+      { label: "Web Developer" },
+      { label: "Software Developer" },
+      { label: "Junior Software Engineer" },
+    ],
+
+    salaryRows: [
+      {
+        experience: "Entry Level",
+        salary: "Varies by role & company",
+      },
+      {
+        experience: "1 – 3 Years",
+        salary: "Depends on skills & experience",
+      },
+      {
+        experience: "3 – 5 Years",
+        salary: "Depends on role & specialization",
+      },
+      {
+        experience: "Experienced",
+        salary: "Depends on company & responsibilities",
+      },
+    ],
+
+    whyChoosePoints: [
+      {
+        icon: MonitorPlay,
+        label: "Live Interactive Classes",
+      },
+      {
+        icon: UserCheck,
+        label: "Industry Mentors",
+      },
+      {
+        icon: Code2,
+        label: "Hands-on Coding",
+      },
+      {
+        icon: FolderKanban,
+        label: "Live Projects",
+      },
+      {
+        icon: MessagesSquare,
+        label: "Doubt Support",
+      },
+      {
+        icon: FileText,
+        label: "Resume Building",
+      },
+      {
+        icon: Users,
+        label: "Mock Interviews",
+      },
+      {
+        icon: ClipboardCheck,
+        label: "Placement Assistance",
+      },
+      {
+        icon: Briefcase,
+        label: "Career Guidance",
+      },
+      {
+        icon: Award,
+        label: "NextPeer Certification",
+      },
+    ],
+
+    certificateTitle:
+      "Full Stack Web Development Professional Certificate",
+
+    journeySteps: [
+      {
+        number: 1,
+        label: "Enroll",
+        icon: BadgeCheck,
+      },
+      {
+        number: 2,
+        label: "Live Classes",
+        icon: MonitorPlay,
+      },
+      {
+        number: 3,
+        label: "Coding Practice",
+        icon: Code2,
+      },
+      {
+        number: 4,
+        label: "Assignments",
+        icon: ClipboardCheck,
+      },
+      {
+        number: 5,
+        label: "Projects",
+        icon: FolderKanban,
+      },
+      {
+        number: 6,
+        label: "Portfolio",
+        icon: Briefcase,
+      },
+      {
+        number: 7,
+        label: "Placement Support",
+        icon: UserCheck,
+      },
+      {
+        number: 8,
+        label: "Certification",
+        icon: Award,
+      },
+    ],
+
+    faqs: [
+      {
+        question: "Do I need prior coding experience?",
+        answer:
+          "No. The program starts with web development fundamentals and progresses step by step.",
+      },
+      {
+        question: "Are the classes live?",
+        answer:
+          "Yes. The program includes instructor-led live training sessions.",
+      },
+      {
+        question: "Will I work on projects?",
+        answer:
+          "Yes. Practical project work is included so you can apply the concepts covered during training.",
+      },
+      {
+        question: "Which technologies will I learn?",
+        answer:
+          "The program covers HTML, CSS, JavaScript, React, Node.js, Express, MongoDB, Git and deployment fundamentals.",
+      },
+      {
+        question: "Will I receive a certificate?",
+        answer:
+          "Yes. Students who successfully complete the required training and project criteria receive a NextPeer certificate.",
+      },
+      {
+        question: "Is career support included?",
+        answer:
+          "The program includes career-focused support such as resume guidance, mock interviews and placement assistance.",
+      },
+    ],
+  },
+};
+
 export const DEFAULT_HELP_ICON = HelpCircle;
