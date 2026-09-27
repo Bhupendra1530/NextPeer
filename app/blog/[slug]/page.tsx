@@ -134,7 +134,17 @@ export default async function BlogPostPage({ params }: Props) {
       if (!trimmed) {
         return null;
       }
-
+      
+if (trimmed.startsWith("### ")) {
+  return (
+    <h3
+      key={index}
+      className="mt-8 mb-3 text-xl font-semibold tracking-tight"
+    >
+      {trimmed.replace("### ", "")}
+    </h3>
+  );
+}
       if (trimmed.startsWith("## ")) {
         return (
           <h2
