@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, LockKeyhole, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, LockKeyhole, Mail } from "lucide-react";
 
 export default function LoginPage() {
   return (
@@ -25,9 +25,11 @@ export default function LoginPage() {
 
             {/* Brand */}
             <div className="mb-8 text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
-                <Sparkles size={22} />
-              </div>
+            <img
+  src="/logo.png"
+  alt="NextPeer Logo"
+  className="mx-auto mb-4 h-20 w-20 object-contain"
+/>
 
               <p className="mb-2 text-sm font-bold text-blue-600">
                 NEXTPEER
