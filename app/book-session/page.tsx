@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -55,6 +55,27 @@ const timeSlots = [
 ];
 
 export default function BookSessionPage() {
+  return (
+    <Suspense fallback={<BookingPageLoading />}>
+      <BookingForm />
+    </Suspense>
+  );
+}
+
+function BookingPageLoading() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="text-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+        <p className="mt-4 text-sm font-medium text-slate-500">
+          Loading counselling session...
+        </p>
+      </div>
+    </main>
+  );
+}
+
+function BookingForm() {
   const searchParams = useSearchParams();
 
   const [form, setForm] = useState({
