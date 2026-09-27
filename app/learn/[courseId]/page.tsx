@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -17,12 +17,14 @@ import {
   Trophy,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import type { User } from "@supabase/supabase-js";
 
 type Course = {
   id: string;
   title: string;
   slug: string | null;
   description: string | null;
+  duration: string | null;
 };
 
 type Enrollment = {
@@ -33,104 +35,33 @@ type Enrollment = {
   enrolled_at: string;
 };
 
-const modules = [
-  {
-    number: 1,
-    title: "AI & Data Science Foundations",
-    description:
-      "Understand artificial intelligence, data science, machine learning and the modern AI ecosystem.",
-    lessons: [
-      "Introduction to Artificial Intelligence",
-      "Understanding Data Science",
-      "AI vs Machine Learning vs Deep Learning",
-      "Real-world applications of AI",
-    ],
-  },
-  {
-    number: 2,
-    title: "Python for Data Science",
-    description:
-      "Build the Python foundations required to work with data and machine learning.",
-    lessons: [
-      "Python fundamentals",
-      "Variables, data types and operators",
-      "Conditions, loops and functions",
-      "Working with Python data structures",
-    ],
-  },
-  {
-    number: 3,
-    title: "Data Analysis",
-    description:
-      "Learn how to clean, analyze and understand real-world datasets.",
-    lessons: [
-      "Introduction to NumPy",
-      "Data analysis with Pandas",
-      "Data cleaning and preprocessing",
-      "Exploratory Data Analysis",
-    ],
-  },
-  {
-    number: 4,
-    title: "Data Visualization",
-    description:
-      "Transform raw information into understandable visual insights.",
-    lessons: [
-      "Introduction to data visualization",
-      "Charts and plots with Matplotlib",
-      "Choosing the right visualization",
-      "Building data-driven insights",
-    ],
-  },
-  {
-    number: 5,
-    title: "Machine Learning",
-    description:
-      "Understand the core concepts behind practical machine learning systems.",
-    lessons: [
-      "Introduction to Machine Learning",
-      "Supervised and unsupervised learning",
-      "Regression and classification",
-      "Model training and evaluation",
-    ],
-  },
-  {
-    number: 6,
-    title: "Generative AI",
-    description:
-      "Explore modern generative AI, large language models and practical AI tools.",
-    lessons: [
-      "Introduction to Generative AI",
-      "Understanding Large Language Models",
-      "Prompt engineering fundamentals",
-      "Building with AI tools",
-    ],
-  },
-  {
-    number: 7,
-    title: "Projects & Case Studies",
-    description:
-      "Apply your knowledge through practical industry-oriented projects.",
-    lessons: [
-      "Data analysis project",
-      "Machine learning project",
-      "Generative AI mini project",
-      "Final capstone project",
-    ],
-  },
-  {
-    number: 8,
-    title: "Career & Certification",
-    description:
-      "Prepare your portfolio and complete the requirements for your NextPeer certificate.",
-    lessons: [
-      "Building your project portfolio",
-      "GitHub project presentation",
-      "Resume and LinkedIn preparation",
-      "Final assessment and certification",
-    ],
-  },
-];
+type Lesson = {
+  id: string;
+  module_id: string;
+  title: string;
+  description: string | null;
+  video_url: string | null;
+  lesson_order: number;
+  duration_minutes: number;
+  is_preview: boolean;
+};
+
+type CourseModule = {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string | null;
+  module_order: number;
+  lessons: Lesson[];
+};
+
+type ProgressRow = {
+  id: string;
+  lesson_id: string;
+  user_id: string;
+  completed: boolean;
+  completed_at: string | null;
+};
 
 export default function CourseLearningPage() {
   const router = useRouter();
@@ -140,10 +71,17 @@ export default function CourseLearningPage() {
     ? params.courseId[0]
     : (params.courseId as string);
 
+  const [user, setUser] = useState<User | null>(null);
   const [course, setCourse] = useState<Course | null>(null);
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
 
+  const [modules, setModules] = useState<CourseModule[]>([]);
+  const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(
+    new Set()
+  );
+
   const [loading, setLoading] = useState(true);
+  const [progressLoading, setProgressLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -153,6 +91,10 @@ export default function CourseLearningPage() {
       try {
         setLoading(true);
         setError("");
+
+        // ------------------------------------------------
+        // 1. GET LOGGED-IN USER
+        // ------------------------------------------------
 
         const {
           data: { user },
@@ -167,6 +109,14 @@ export default function CourseLearningPage() {
           router.replace("/login");
           return;
         }
+
+        if (!mounted) return;
+
+        setUser(user);
+
+        // ------------------------------------------------
+        // 2. VERIFY ACTIVE ENROLLMENT
+        // ------------------------------------------------
 
         const { data: enrollmentData, error: enrollmentError } =
           await supabase
@@ -186,15 +136,17 @@ export default function CourseLearningPage() {
             setError(
               "You do not have an active enrollment for this program."
             );
-            setLoading(false);
           }
-
           return;
         }
 
+        // ------------------------------------------------
+        // 3. LOAD COURSE
+        // ------------------------------------------------
+
         const { data: courseData, error: courseError } = await supabase
           .from("courses")
-          .select("id, title, slug, description")
+          .select("id, title, slug, description, duration")
           .eq("id", courseId)
           .single();
 
@@ -202,10 +154,91 @@ export default function CourseLearningPage() {
           throw courseError;
         }
 
-        if (mounted) {
-          setEnrollment(enrollmentData as Enrollment);
-          setCourse(courseData as Course);
+        // ------------------------------------------------
+        // 4. LOAD MODULES
+        // ------------------------------------------------
+
+        const { data: moduleData, error: moduleError } = await supabase
+          .from("course_modules")
+          .select(
+            "id, course_id, title, description, module_order"
+          )
+          .eq("course_id", courseId)
+          .order("module_order", { ascending: true });
+
+        if (moduleError) {
+          throw moduleError;
         }
+
+        // ------------------------------------------------
+        // 5. LOAD LESSONS FOR EACH MODULE
+        // ------------------------------------------------
+
+        const moduleIds = (moduleData ?? []).map((module) => module.id);
+
+        let lessonData: Lesson[] = [];
+
+        if (moduleIds.length > 0) {
+          const { data, error: lessonError } = await supabase
+            .from("lessons")
+            .select(
+              "id, module_id, title, description, video_url, lesson_order, duration_minutes, is_preview"
+            )
+            .in("module_id", moduleIds)
+            .order("lesson_order", { ascending: true });
+
+          if (lessonError) {
+            throw lessonError;
+          }
+
+          lessonData = (data ?? []) as Lesson[];
+        }
+
+        const modulesWithLessons: CourseModule[] = (moduleData ?? []).map(
+          (module) => ({
+            ...module,
+            lessons: lessonData
+              .filter((lesson) => lesson.module_id === module.id)
+              .sort((a, b) => a.lesson_order - b.lesson_order),
+          })
+        );
+
+        // ------------------------------------------------
+        // 6. LOAD STUDENT PROGRESS
+        // ------------------------------------------------
+
+        const allLessonIds = lessonData.map((lesson) => lesson.id);
+
+        let progressData: ProgressRow[] = [];
+
+        if (allLessonIds.length > 0) {
+          const { data, error: progressError } = await supabase
+            .from("lesson_progress")
+            .select(
+              "id, lesson_id, user_id, completed, completed_at"
+            )
+            .eq("user_id", user.id)
+            .in("lesson_id", allLessonIds);
+
+          if (progressError) {
+            throw progressError;
+          }
+
+          progressData = (data ?? []) as ProgressRow[];
+        }
+
+        const completedIds = new Set(
+          progressData
+            .filter((row) => row.completed)
+            .map((row) => row.lesson_id)
+        );
+
+        if (!mounted) return;
+
+        setEnrollment(enrollmentData as Enrollment);
+        setCourse(courseData as Course);
+        setModules(modulesWithLessons);
+        setCompletedLessonIds(completedIds);
       } catch (err) {
         console.error("Learning page error:", err);
 
@@ -232,11 +265,142 @@ export default function CourseLearningPage() {
     };
   }, [courseId, router]);
 
+  // ------------------------------------------------
+  // COURSE STATS
+  // ------------------------------------------------
+
+  const allLessons = useMemo(
+    () => modules.flatMap((module) => module.lessons),
+    [modules]
+  );
+
+  const totalLessons = allLessons.length;
+
+  const completedLessons = allLessons.filter((lesson) =>
+    completedLessonIds.has(lesson.id)
+  ).length;
+
+  const progress =
+    totalLessons === 0
+      ? 0
+      : Math.round((completedLessons / totalLessons) * 100);
+
+  const courseCompleted =
+    totalLessons > 0 && completedLessons === totalLessons;
+
+  // ------------------------------------------------
+  // LESSON UNLOCK LOGIC
+  // ------------------------------------------------
+
+  const isLessonUnlocked = (lessonId: string) => {
+    const lessonIndex = allLessons.findIndex(
+      (lesson) => lesson.id === lessonId
+    );
+
+    if (lessonIndex === -1) return false;
+
+    // First lesson always available
+    if (lessonIndex === 0) return true;
+
+    // Completed lessons stay available
+    if (completedLessonIds.has(lessonId)) return true;
+
+    // Next lesson unlocks when previous lesson is completed
+    const previousLesson = allLessons[lessonIndex - 1];
+
+    return completedLessonIds.has(previousLesson.id);
+  };
+
+  // ------------------------------------------------
+  // MARK LESSON COMPLETE
+  // ------------------------------------------------
+
+  const markLessonComplete = async (lesson: Lesson) => {
+    if (!user) return;
+
+    if (!isLessonUnlocked(lesson.id)) return;
+
+    if (completedLessonIds.has(lesson.id)) return;
+
+    try {
+      setProgressLoading(lesson.id);
+      setError("");
+
+      const completedAt = new Date().toISOString();
+
+      const { error: progressError } = await supabase
+        .from("lesson_progress")
+        .upsert(
+          {
+            user_id: user.id,
+            lesson_id: lesson.id,
+            completed: true,
+            completed_at: completedAt,
+            updated_at: completedAt,
+          },
+          {
+            onConflict: "user_id,lesson_id",
+          }
+        );
+
+      if (progressError) {
+        throw progressError;
+      }
+
+      setCompletedLessonIds((previous) => {
+        const updated = new Set(previous);
+        updated.add(lesson.id);
+        return updated;
+      });
+    } catch (err) {
+      console.error("Progress update error:", err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to update lesson progress."
+      );
+    } finally {
+      setProgressLoading(null);
+    }
+  };
+
+  // ------------------------------------------------
+  // START / CONTINUE COURSE
+  // ------------------------------------------------
+
+  const handleStartLearning = () => {
+    if (allLessons.length === 0) return;
+
+    const nextLesson =
+      allLessons.find(
+        (lesson) => !completedLessonIds.has(lesson.id)
+      ) ?? allLessons[0];
+
+    const element = document.getElementById(
+      `lesson-${nextLesson.id}`
+    );
+
+    element?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  };
+
+  // ------------------------------------------------
+  // LOGOUT
+  // ------------------------------------------------
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
+
     router.push("/login");
     router.refresh();
   };
+
+  // ------------------------------------------------
+  // LOADING
+  // ------------------------------------------------
 
   if (loading) {
     return (
@@ -254,7 +418,11 @@ export default function CourseLearningPage() {
     );
   }
 
-  if (error || !course || !enrollment) {
+  // ------------------------------------------------
+  // ERROR / NO ENROLLMENT
+  // ------------------------------------------------
+
+  if (error && (!course || !enrollment)) {
     return (
       <main className="min-h-screen bg-slate-50">
         <div className="mx-auto flex min-h-[75vh] max-w-3xl items-center justify-center px-4">
@@ -268,8 +436,7 @@ export default function CourseLearningPage() {
             </h1>
 
             <p className="mx-auto mt-3 max-w-lg text-slate-600">
-              {error ||
-                "We couldn't verify your enrollment for this program."}
+              {error}
             </p>
 
             <Link
@@ -285,21 +452,14 @@ export default function CourseLearningPage() {
     );
   }
 
-  const totalLessons = modules.reduce(
-    (total, module) => total + module.lessons.length,
-    0
-  );
-
-  const completedLessons = 0;
-
-  const progress =
-    totalLessons === 0
-      ? 0
-      : Math.round((completedLessons / totalLessons) * 100);
+  if (!course || !enrollment) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-slate-50">
-      {/* Top navigation */}
+      {/* TOP NAVIGATION */}
+
       <div className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link
@@ -329,7 +489,8 @@ export default function CourseLearningPage() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Course hero */}
+        {/* COURSE HERO */}
+
         <section className="overflow-hidden rounded-3xl bg-slate-950 text-white shadow-sm">
           <div className="relative px-6 py-9 sm:px-10 sm:py-12 lg:px-12">
             <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-blue-600/20 blur-3xl" />
@@ -352,22 +513,38 @@ export default function CourseLearningPage() {
 
               <div className="mt-7 flex flex-wrap gap-3 text-sm">
                 <div className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5">
-                  <Clock3 size={17} className="text-blue-300" />
-                  3 Months
+                  <Clock3
+                    size={17}
+                    className="text-blue-300"
+                  />
+
+                  {course.duration || "3 Months"}
                 </div>
 
                 <div className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5">
-                  <BookOpen size={17} className="text-blue-300" />
+                  <BookOpen
+                    size={17}
+                    className="text-blue-300"
+                  />
+
                   {modules.length} Modules
                 </div>
 
                 <div className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5">
-                  <PlayCircle size={17} className="text-blue-300" />
+                  <PlayCircle
+                    size={17}
+                    className="text-blue-300"
+                  />
+
                   {totalLessons} Lessons
                 </div>
 
                 <div className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2.5">
-                  <FolderKanban size={17} className="text-blue-300" />
+                  <FolderKanban
+                    size={17}
+                    className="text-blue-300"
+                  />
+
                   Practical Projects
                 </div>
               </div>
@@ -375,7 +552,16 @@ export default function CourseLearningPage() {
           </div>
         </section>
 
-        {/* Progress cards */}
+        {/* DATABASE ERROR */}
+
+        {error && (
+          <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+            {error}
+          </div>
+        )}
+
+        {/* PROGRESS CARDS */}
+
         <section className="mt-6 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
@@ -396,8 +582,10 @@ export default function CourseLearningPage() {
 
             <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">
               <div
-                className="h-full rounded-full bg-blue-600 transition-all"
-                style={{ width: `${progress}%` }}
+                className="h-full rounded-full bg-blue-600 transition-all duration-500"
+                style={{
+                  width: `${progress}%`,
+                }}
               />
             </div>
           </div>
@@ -411,6 +599,7 @@ export default function CourseLearningPage() {
 
                 <p className="mt-2 text-3xl font-bold text-slate-900">
                   {completedLessons}
+
                   <span className="text-lg font-semibold text-slate-400">
                     /{totalLessons}
                   </span>
@@ -434,24 +623,45 @@ export default function CourseLearningPage() {
                   Certificate
                 </p>
 
-                <p className="mt-2 text-xl font-bold text-slate-900">
-                  Locked
+                <p
+                  className={`mt-2 text-xl font-bold ${
+                    courseCompleted
+                      ? "text-green-600"
+                      : "text-slate-900"
+                  }`}
+                >
+                  {courseCompleted
+                    ? "Eligible"
+                    : "Locked"}
                 </p>
               </div>
 
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
-                <Lock size={22} />
+              <div
+                className={`flex h-12 w-12 items-center justify-center rounded-xl ${
+                  courseCompleted
+                    ? "bg-green-50 text-green-600"
+                    : "bg-amber-50 text-amber-600"
+                }`}
+              >
+                {courseCompleted ? (
+                  <CheckCircle2 size={22} />
+                ) : (
+                  <Lock size={22} />
+                )}
               </div>
             </div>
 
             <p className="mt-5 text-sm text-slate-500">
-              Complete the program requirements to unlock your certificate.
+              {courseCompleted
+                ? "You completed all lessons in this program."
+                : "Complete the program requirements to unlock your certificate."}
             </p>
           </div>
         </section>
 
         <div className="mt-8 grid gap-7 lg:grid-cols-[1fr_330px]">
-          {/* Curriculum */}
+          {/* CURRICULUM */}
+
           <section>
             <div className="mb-5">
               <p className="text-xs font-bold uppercase tracking-wider text-blue-600">
@@ -463,23 +673,35 @@ export default function CourseLearningPage() {
               </h2>
 
               <p className="mt-2 text-sm text-slate-500">
-                Follow the modules in sequence and build your skills step by
-                step.
+                Complete each lesson to unlock the next one.
               </p>
             </div>
 
-            <div className="space-y-4">
-              {modules.map((module, moduleIndex) => {
-                const isFirstModule = moduleIndex === 0;
+            {modules.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+                <BookOpen
+                  size={30}
+                  className="mx-auto text-slate-400"
+                />
 
-                return (
+                <h3 className="mt-4 font-bold text-slate-900">
+                  Curriculum coming soon
+                </h3>
+
+                <p className="mt-2 text-sm text-slate-500">
+                  Modules haven't been added to this program yet.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {modules.map((module) => (
                   <div
-                    key={module.number}
+                    key={module.id}
                     className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
                   >
                     <div className="flex gap-4 p-5 sm:p-6">
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-sm font-bold text-white">
-                        {module.number}
+                        {module.module_order}
                       </div>
 
                       <div className="min-w-0 flex-1">
@@ -489,9 +711,11 @@ export default function CourseLearningPage() {
                               {module.title}
                             </h3>
 
-                            <p className="mt-1 text-sm leading-6 text-slate-500">
-                              {module.description}
-                            </p>
+                            {module.description && (
+                              <p className="mt-1 text-sm leading-6 text-slate-500">
+                                {module.description}
+                              </p>
+                            )}
                           </div>
 
                           <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
@@ -499,46 +723,129 @@ export default function CourseLearningPage() {
                           </span>
                         </div>
 
-                        <div className="mt-5 space-y-2">
-                          {module.lessons.map((lesson, lessonIndex) => {
-                            const lessonAvailable =
-                              isFirstModule && lessonIndex === 0;
+                        <div className="mt-5 space-y-3">
+                          {module.lessons.map((lesson) => {
+                            const completed =
+                              completedLessonIds.has(
+                                lesson.id
+                              );
+
+                            const unlocked =
+                              isLessonUnlocked(lesson.id);
+
+                            const updating =
+                              progressLoading === lesson.id;
 
                             return (
                               <div
-                                key={lesson}
-                                className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3"
+                                id={`lesson-${lesson.id}`}
+                                key={lesson.id}
+                                className={`rounded-xl border px-4 py-4 transition ${
+                                  completed
+                                    ? "border-green-200 bg-green-50/60"
+                                    : unlocked
+                                    ? "border-blue-100 bg-blue-50/40"
+                                    : "border-slate-100 bg-slate-50"
+                                }`}
                               >
-                                <div className="flex min-w-0 items-center gap-3">
-                                  {lessonAvailable ? (
-                                    <PlayCircle
-                                      size={19}
-                                      className="shrink-0 text-blue-600"
-                                    />
-                                  ) : (
-                                    <Lock
-                                      size={17}
-                                      className="shrink-0 text-slate-400"
-                                    />
-                                  )}
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                  <div className="flex min-w-0 items-start gap-3">
+                                    <div className="mt-0.5 shrink-0">
+                                      {completed ? (
+                                        <CheckCircle2
+                                          size={21}
+                                          className="text-green-600"
+                                        />
+                                      ) : unlocked ? (
+                                        <PlayCircle
+                                          size={21}
+                                          className="text-blue-600"
+                                        />
+                                      ) : (
+                                        <Lock
+                                          size={18}
+                                          className="text-slate-400"
+                                        />
+                                      )}
+                                    </div>
 
-                                  <div>
-                                    <p className="text-sm font-medium text-slate-700">
-                                      {lesson}
-                                    </p>
+                                    <div className="min-w-0">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <p className="font-semibold text-slate-800">
+                                          {lesson.title}
+                                        </p>
 
-                                    <p className="mt-0.5 text-xs text-slate-400">
-                                      Lesson {lessonIndex + 1}
-                                    </p>
+                                        {lesson.is_preview && (
+                                          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-blue-700">
+                                            Preview
+                                          </span>
+                                        )}
+                                      </div>
+
+                                      {lesson.description && (
+                                        <p className="mt-1 text-xs leading-5 text-slate-500">
+                                          {lesson.description}
+                                        </p>
+                                      )}
+
+                                      <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                                        <span>
+                                          Lesson{" "}
+                                          {lesson.lesson_order}
+                                        </span>
+
+                                        {lesson.duration_minutes >
+                                          0 && (
+                                          <span className="flex items-center gap-1">
+                                            <Clock3 size={13} />
+
+                                            {
+                                              lesson.duration_minutes
+                                            }{" "}
+                                            min
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="shrink-0">
+                                    {completed ? (
+                                      <span className="inline-flex items-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-xs font-bold text-green-700">
+                                        <CheckCircle2
+                                          size={15}
+                                        />
+                                        Completed
+                                      </span>
+                                    ) : unlocked ? (
+                                      <button
+                                        type="button"
+                                        disabled={updating}
+                                        onClick={() =>
+                                          markLessonComplete(
+                                            lesson
+                                          )
+                                        }
+                                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                      >
+                                        {updating
+                                          ? "Saving..."
+                                          : "Mark Complete"}
+
+                                        {!updating && (
+                                          <ChevronRight
+                                            size={15}
+                                          />
+                                        )}
+                                      </button>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-400">
+                                        <Lock size={14} />
+                                        Locked
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
-
-                                {lessonAvailable && (
-                                  <ChevronRight
-                                    size={18}
-                                    className="shrink-0 text-blue-600"
-                                  />
-                                )}
                               </div>
                             );
                           })}
@@ -546,12 +853,13 @@ export default function CourseLearningPage() {
                       </div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
 
-          {/* Sidebar */}
+          {/* SIDEBAR */}
+
           <aside className="space-y-5">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-24">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -559,21 +867,32 @@ export default function CourseLearningPage() {
               </div>
 
               <h3 className="mt-5 text-xl font-bold text-slate-900">
-                Start learning
+                {completedLessons === 0
+                  ? "Start learning"
+                  : courseCompleted
+                  ? "Program completed"
+                  : "Continue learning"}
               </h3>
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                Begin with the fundamentals and continue through each module
-                of your program.
+                {courseCompleted
+                  ? "You've completed every lesson in this program."
+                  : "Continue through your curriculum and your progress will be saved automatically."}
               </p>
 
-              <button
-                type="button"
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
-              >
-                Start Module 1
-                <ChevronRight size={18} />
-              </button>
+              {!courseCompleted && totalLessons > 0 && (
+                <button
+                  type="button"
+                  onClick={handleStartLearning}
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                >
+                  {completedLessons === 0
+                    ? "Start Module 1"
+                    : "Continue Learning"}
+
+                  <ChevronRight size={18} />
+                </button>
+              )}
 
               <div className="my-6 border-t border-slate-100" />
 
@@ -583,39 +902,71 @@ export default function CourseLearningPage() {
 
               <div className="mt-4 space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Duration</span>
+                  <span className="text-slate-500">
+                    Duration
+                  </span>
+
                   <span className="font-semibold text-slate-800">
-                    3 Months
+                    {course.duration || "3 Months"}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Modules</span>
+                  <span className="text-slate-500">
+                    Modules
+                  </span>
+
                   <span className="font-semibold text-slate-800">
                     {modules.length}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Lessons</span>
+                  <span className="text-slate-500">
+                    Lessons
+                  </span>
+
                   <span className="font-semibold text-slate-800">
                     {totalLessons}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500">Enrollment</span>
+                  <span className="text-slate-500">
+                    Completed
+                  </span>
+
+                  <span className="font-semibold text-blue-600">
+                    {completedLessons}/{totalLessons}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-500">
+                    Enrollment
+                  </span>
+
                   <span className="font-semibold capitalize text-green-600">
                     {enrollment.status}
                   </span>
                 </div>
               </div>
 
-              <div className="mt-6 rounded-xl bg-blue-50 p-4">
+              <div
+                className={`mt-6 rounded-xl p-4 ${
+                  courseCompleted
+                    ? "bg-green-50"
+                    : "bg-blue-50"
+                }`}
+              >
                 <div className="flex gap-3">
                   <GraduationCap
                     size={21}
-                    className="mt-0.5 shrink-0 text-blue-600"
+                    className={`mt-0.5 shrink-0 ${
+                      courseCompleted
+                        ? "text-green-600"
+                        : "text-blue-600"
+                    }`}
                   />
 
                   <div>
@@ -624,8 +975,9 @@ export default function CourseLearningPage() {
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-slate-600">
-                      Complete the required lessons, projects and assessments
-                      to become eligible for certification.
+                      {courseCompleted
+                        ? "You have completed the lesson requirement for this program."
+                        : "Complete all lessons to become eligible for certification."}
                     </p>
                   </div>
                 </div>
