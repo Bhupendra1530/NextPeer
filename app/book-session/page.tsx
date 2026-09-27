@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
@@ -26,24 +25,13 @@ const timeSlots = [
 ];
 
 export default function BookSessionPage() {
-  const searchParams = useSearchParams();
-
-  const programFromUrl =
-    searchParams.get("program")?.replaceAll("-", " ") || "";
-
-  const matchedProgram =
-    programs.find(
-      (program) =>
-        program.toLowerCase() === programFromUrl.toLowerCase()
-    ) || "";
-
   const [form, setForm] = useState({
     full_name: "",
     email: "",
     phone: "",
     college_name: "",
     current_year: "",
-    program_name: matchedProgram,
+   program_name: "",
     preferred_date: "",
     preferred_time: "",
     message: "",
