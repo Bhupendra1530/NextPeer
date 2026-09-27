@@ -177,7 +177,32 @@ if (trimmed.startsWith("### ")) {
     </p>
   )}
 </div>
-        </article>
+      <div className="mt-12 border-t pt-8">
+  <h2 className="mb-4 text-2xl font-bold">
+    Continue Learning with NextPeer
+  </h2>
+
+  <p className="mb-4 leading-8 text-gray-700">
+    Build practical, career-focused skills with NextPeer programs designed
+    for college students.
+  </p>
+
+  <div className="flex flex-col gap-3">
+    <a
+      href="/programs"
+      className="font-semibold text-blue-600 hover:underline"
+    >
+      Explore NextPeer Programs →
+    </a>
+
+    <a
+      href="/blog"
+      className="font-semibold text-blue-600 hover:underline"
+    >
+      Read More Career & Technology Articles →
+    </a>
+  </div>
+</div>  </article>
       </main>
 
       <Footer />
