@@ -58,6 +58,37 @@ export default async function BlogPostPage({ params }: Props) {
     },
   };
 
+  const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is DSA still important in the AI era?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Data Structures and Algorithms remain important because they help developers understand problem solving, efficiency, optimization, and how software works beyond AI-generated code.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Should students learn DSA even when AI can generate code?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. AI can help generate code, but understanding DSA helps students evaluate solutions, debug problems, improve performance, and make better technical decisions.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is DSA useful for software engineering interviews?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "DSA is commonly used in technical interview preparation because it develops problem-solving skills and helps candidates understand common programming patterns and algorithms.",
+      },
+    },
+  ],
+};
+
   return (
     <>
       <script
@@ -67,6 +98,12 @@ export default async function BlogPostPage({ params }: Props) {
         }}
       />
 
+      <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(faqSchema),
+  }}
+/>
       <Header />
 
       <main className="mx-auto max-w-4xl px-6 py-16">
