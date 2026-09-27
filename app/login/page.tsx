@@ -1,7 +1,41 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, LockKeyhole, Mail } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setLoading(true);
+    setError("");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    // Successful login
+    router.push("/");
+    router.refresh();
+  };
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-slate-50">
       {/* Background */}
@@ -25,11 +59,11 @@ export default function LoginPage() {
 
             {/* Brand */}
             <div className="mb-8 text-center">
-            <img
-  src="/logo.png"
-  alt="NextPeer Logo"
-  className="mx-auto mb-4 h-20 w-20 object-contain"
-/>
+              <img
+                src="/logo.png"
+                alt="NextPeer Logo"
+                className="mx-auto mb-4 h-20 w-20 object-contain"
+              />
 
               <p className="mb-2 text-sm font-bold text-blue-600">
                 NEXTPEER
@@ -45,7 +79,9 @@ export default function LoginPage() {
             </div>
 
             {/* Form */}
-            <form className="space-y-5">
+            <form onSubmit={handleLogin} className="space-y-5">
+
+              {/* Email */}
               <div>
                 <label className="mb-2 block text-sm font-semibold text-slate-700">
                   Email address
@@ -59,12 +95,17 @@ export default function LoginPage() {
 
                   <input
                     type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
+                    required
+                    autoComplete="email"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                   />
                 </div>
               </div>
 
+              {/* Password */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
                   <label className="text-sm font-semibold text-slate-700">
@@ -87,18 +128,24 @@ export default function LoginPage() {
 
                   <input
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
+                    required
+                    autoComplete="current-password"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                   />
                 </div>
               </div>
 
+              {/* Remember */}
               <div className="flex items-center gap-2">
                 <input
                   id="remember"
                   type="checkbox"
                   className="h-4 w-4 rounded border-slate-300"
                 />
+
                 <label
                   htmlFor="remember"
                   className="text-sm text-slate-600"
@@ -107,20 +154,33 @@ export default function LoginPage() {
                 </label>
               </div>
 
+              {/* Error */}
+              {error && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-sm font-medium text-red-600">
+                    {error}
+                  </p>
+                </div>
+              )}
+
+              {/* Login */}
               <button
                 type="submit"
-                className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700"
+                disabled={loading}
+                className="w-full rounded-xl bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-200 transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Log in to NextPeer →
+                {loading ? "Logging in..." : "Log in to NextPeer →"}
               </button>
             </form>
 
             {/* Divider */}
             <div className="my-6 flex items-center gap-4">
               <div className="h-px flex-1 bg-slate-200" />
+
               <span className="text-xs font-medium text-slate-400">
                 OR CONTINUE WITH
               </span>
+
               <div className="h-px flex-1 bg-slate-200" />
             </div>
 
@@ -129,13 +189,17 @@ export default function LoginPage() {
               type="button"
               className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
-              <span className="text-lg font-bold text-blue-600">G</span>
+              <span className="text-lg font-bold text-blue-600">
+                G
+              </span>
+
               Continue with Google
             </button>
 
             {/* Signup */}
             <p className="mt-7 text-center text-sm text-slate-500">
               New to NextPeer?{" "}
+
               <Link
                 href="/signup"
                 className="font-bold text-blue-600 hover:text-blue-700"
@@ -148,6 +212,7 @@ export default function LoginPage() {
           <p className="mt-5 text-center text-xs text-slate-400">
             Learn today. Build tomorrow.
           </p>
+
         </div>
       </div>
     </main>
