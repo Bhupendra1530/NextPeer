@@ -716,3 +716,442 @@ body {
     margin-top: 38px;
   }
 }
+
+/* ========================================
+   NextPeer Journey Section
+======================================== */
+
+.how-nextpeer-section {
+  position: relative;
+  overflow: hidden;
+
+  padding: 110px 24px;
+
+  background: #ffffff;
+}
+
+.how-nextpeer-section::before {
+  content: "";
+
+  position: absolute;
+  width: 500px;
+  height: 500px;
+
+  top: -250px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  background: rgba(37, 99, 235, 0.07);
+  filter: blur(100px);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.how-nextpeer-container {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+}
+
+/* HEADING */
+
+.how-nextpeer-heading {
+  max-width: 760px;
+
+  margin: 0 auto 80px;
+
+  text-align: center;
+}
+
+.how-nextpeer-eyebrow {
+  display: inline-block;
+
+  margin-bottom: 15px;
+
+  color: #2563eb;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+}
+
+.how-nextpeer-heading h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: clamp(36px, 5vw, 54px);
+
+  line-height: 1.08;
+
+  font-weight: 800;
+
+  letter-spacing: -0.04em;
+}
+
+.how-nextpeer-heading h2 span {
+  color: #2563eb;
+}
+
+.how-nextpeer-heading p {
+  max-width: 620px;
+
+  margin: 20px auto 0;
+
+  color: #6b7280;
+
+  font-size: 17px;
+
+  line-height: 1.7;
+}
+
+/* ========================================
+   JOURNEY
+======================================== */
+
+.journey-wrapper {
+  position: relative;
+
+  padding-top: 30px;
+}
+
+/* BACKGROUND LINE */
+
+.journey-line {
+  position: absolute;
+
+  top: 67px;
+
+  left: 9%;
+  right: 9%;
+
+  height: 3px;
+
+  overflow: hidden;
+
+  background: #e5e7eb;
+
+  border-radius: 100px;
+}
+
+/* ANIMATED BLUE LINE */
+
+.journey-line-progress {
+  width: 45%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    #2563eb,
+    #60a5fa,
+    #2563eb
+  );
+
+  border-radius: 100px;
+
+  animation: nextpeerJourney 4s ease-in-out infinite;
+}
+
+/* GRID */
+
+.journey-grid {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 28px;
+}
+
+/* STEP */
+
+.journey-step {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+}
+
+/* NUMBER */
+
+.journey-number {
+  margin-bottom: 14px;
+
+  color: #2563eb;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+}
+
+/* ICON */
+
+.journey-icon {
+  position: relative;
+
+  z-index: 3;
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #2563eb;
+
+  background: #ffffff;
+
+  border: 2px solid #dbeafe;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 8px 30px rgba(37, 99, 235, 0.12);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.journey-step:hover .journey-icon {
+  transform: translateY(-6px) scale(1.05);
+
+  border-color: #2563eb;
+
+  box-shadow:
+    0 15px 35px rgba(37, 99, 235, 0.18);
+}
+
+/* TEXT */
+
+.journey-step h3 {
+  margin: 24px 0 0;
+
+  color: #111827;
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+
+.journey-step p {
+  max-width: 190px;
+
+  margin: 10px auto 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+/* ARROWS */
+
+.journey-arrow {
+  position: absolute;
+
+  top: 50px;
+
+  right: -24px;
+
+  color: #93c5fd;
+}
+
+/* ========================================
+   FINAL MESSAGE
+======================================== */
+
+.journey-message {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-top: 75px;
+}
+
+.journey-message span {
+  padding: 9px 15px;
+
+  color: #1d4ed8;
+
+  background: #eff6ff;
+
+  border: 1px solid #dbeafe;
+
+  border-radius: 999px;
+
+  font-size: 13px;
+
+  font-weight: 800;
+}
+
+/* ========================================
+   ANIMATION
+======================================== */
+
+@keyframes nextpeerJourney {
+
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(120%);
+  }
+
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+/* ========================================
+   TABLET
+======================================== */
+
+@media (max-width: 1000px) {
+
+  .journey-grid {
+    grid-template-columns: repeat(3, 1fr);
+
+    row-gap: 55px;
+  }
+
+  .journey-line {
+    display: none;
+  }
+
+  .journey-arrow {
+    display: none;
+  }
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 650px) {
+
+  .how-nextpeer-section {
+    padding: 75px 20px;
+  }
+
+  .how-nextpeer-heading {
+    margin-bottom: 55px;
+  }
+
+  .how-nextpeer-heading h2 {
+    font-size: 36px;
+  }
+
+  .how-nextpeer-heading p {
+    font-size: 15px;
+  }
+
+  .journey-grid {
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0;
+  }
+
+  .journey-grid::before {
+    content: "";
+
+    position: absolute;
+
+    left: 34px;
+
+    top: 50px;
+    bottom: 50px;
+
+    width: 2px;
+
+    background: #dbeafe;
+  }
+
+  .journey-step {
+    min-height: 150px;
+
+    padding-left: 95px;
+
+    align-items: flex-start;
+
+    text-align: left;
+  }
+
+  .journey-number {
+    margin-bottom: 7px;
+  }
+
+  .journey-icon {
+    position: absolute;
+
+    left: 0;
+
+    top: 22px;
+
+    width: 68px;
+
+    height: 68px;
+  }
+
+  .journey-step h3 {
+    margin-top: 0;
+
+    font-size: 18px;
+  }
+
+  .journey-step p {
+    max-width: 100%;
+
+    margin: 8px 0 0;
+
+    font-size: 14px;
+  }
+
+  .journey-message {
+    margin-top: 45px;
+
+    flex-wrap: wrap;
+  }
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .journey-line-progress {
+    animation: none;
+    width: 100%;
+  }
+}
