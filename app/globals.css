@@ -235,3 +235,78 @@ body {
     animation-play-state: paused;
   }
 }
+
+/* University logo marquee - clean logo version */
+
+.university-logo-track {
+  align-items: flex-start;
+  gap: 55px;
+}
+
+.university-logo-item {
+  width: 190px;
+  flex: 0 0 190px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  text-align: center;
+}
+
+.university-logo-image {
+  position: relative;
+
+  width: 180px;
+  height: 105px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.university-logo {
+  object-fit: contain !important;
+  object-position: center !important;
+
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.university-logo-name {
+  margin: 14px 0 0;
+
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 700;
+
+  color: var(--foreground);
+
+  white-space: normal;
+}
+
+@media (max-width: 768px) {
+  .university-logo-track {
+    gap: 32px;
+  }
+
+  .university-logo-item {
+    width: 150px;
+    flex-basis: 150px;
+  }
+
+  .university-logo-image {
+    width: 145px;
+    height: 85px;
+  }
+
+  .university-logo-name {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+}
