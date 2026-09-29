@@ -401,3 +401,318 @@ body {
     animation-play-state: paused;
   }
 }
+
+/* ========================================
+   NextPeer Career Paths
+======================================== */
+
+.career-paths-section {
+  padding: 100px 24px;
+  background: #f8faff;
+}
+
+.career-paths-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.career-paths-heading {
+  max-width: 720px;
+  margin: 0 auto 55px;
+  text-align: center;
+}
+
+.career-paths-eyebrow {
+  display: inline-block;
+  margin-bottom: 14px;
+
+  color: #2563eb;
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.career-paths-heading h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.career-paths-heading h2 span {
+  color: #2563eb;
+}
+
+.career-paths-heading p {
+  max-width: 600px;
+  margin: 18px auto 0;
+
+  color: #6b7280;
+
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* GRID */
+
+.career-paths-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+/* CARD */
+
+.career-path-card {
+  position: relative;
+
+  min-height: 290px;
+  padding: 26px;
+
+  display: flex;
+  flex-direction: column;
+
+  text-decoration: none;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.career-path-card:hover {
+  transform: translateY(-7px);
+
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 20px 50px rgba(37, 99, 235, 0.10);
+}
+
+/* FEATURED */
+
+.career-path-featured {
+  border-color: #93c5fd;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 30%,
+      #eff6ff 100%
+    );
+}
+
+.career-path-popular {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+
+  padding: 6px 10px;
+
+  color: #1d4ed8;
+  background: #dbeafe;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* TOP */
+
+.career-path-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.career-path-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #2563eb;
+  background: #eff6ff;
+
+  border-radius: 15px;
+}
+
+.career-path-arrow {
+  color: #9ca3af;
+
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease;
+}
+
+.career-path-card:hover .career-path-arrow {
+  color: #2563eb;
+  transform: translate(3px, -3px);
+}
+
+/* CONTENT */
+
+.career-path-content {
+  margin-top: 28px;
+}
+
+.career-path-content h3 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.career-path-content p {
+  margin: 10px 0 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* SKILLS */
+
+.career-path-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+
+  margin-top: 20px;
+}
+
+.career-path-skills span {
+  padding: 6px 9px;
+
+  color: #4b5563;
+  background: #f3f4f6;
+
+  border-radius: 7px;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* EXPLORE */
+
+.career-path-explore {
+  margin-top: auto;
+  padding-top: 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: #2563eb;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* BOTTOM CTA */
+
+.career-paths-bottom {
+  margin-top: 48px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  text-align: center;
+}
+
+.career-paths-bottom p {
+  margin: 0;
+
+  color: #6b7280;
+
+  font-size: 14px;
+}
+
+.career-guidance-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 13px 20px;
+
+  color: #ffffff;
+  background: #2563eb;
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.career-guidance-button:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+  .career-paths-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .career-paths-section {
+    padding: 70px 18px;
+  }
+
+  .career-paths-heading {
+    margin-bottom: 38px;
+  }
+
+  .career-paths-heading h2 {
+    font-size: 36px;
+  }
+
+  .career-paths-heading p {
+    font-size: 15px;
+  }
+
+  .career-paths-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .career-path-card {
+    min-height: 270px;
+  }
+
+  .career-paths-bottom {
+    margin-top: 38px;
+  }
+}
