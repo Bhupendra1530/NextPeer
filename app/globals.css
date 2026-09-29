@@ -26,16 +26,17 @@ body {
 }
 
 /* ========================================
-   NEXTPeer Campus & Career Marquee
+   NextPeer University Marquee
 ======================================== */
 
 .campus-career-section {
-  padding: 90px 0;
+  padding: 80px 0 90px;
   overflow: hidden;
+
   background:
     radial-gradient(
       circle at 50% 0%,
-      rgba(37, 99, 235, 0.08),
+      rgba(37, 99, 235, 0.07),
       transparent 35%
     ),
     var(--background);
@@ -43,7 +44,7 @@ body {
 
 .campus-career-heading {
   max-width: 850px;
-  margin: 0 auto 60px;
+  margin: 0 auto 55px;
   padding: 0 24px;
   text-align: center;
 }
@@ -51,7 +52,9 @@ body {
 .campus-eyebrow {
   display: inline-block;
   margin-bottom: 16px;
+
   color: #2563eb;
+
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -59,7 +62,8 @@ body {
 
 .campus-career-heading h2 {
   margin: 0;
-  font-size: clamp(32px, 5vw, 54px);
+
+  font-size: clamp(32px, 5vw, 52px);
   line-height: 1.08;
   font-weight: 800;
   letter-spacing: -0.04em;
@@ -72,26 +76,29 @@ body {
 .campus-career-heading p {
   max-width: 650px;
   margin: 20px auto 0;
+
   font-size: 17px;
   line-height: 1.7;
+
   opacity: 0.7;
 }
 
-.marquee-group {
-  margin-top: 45px;
-}
+/* Section title */
 
-.company-group {
-  margin-top: 60px;
+.marquee-group {
+  margin-top: 40px;
 }
 
 .marquee-label {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
   gap: 10px;
-  margin-bottom: 22px;
+
+  margin-bottom: 35px;
   padding: 0 20px;
+
   text-align: center;
 }
 
@@ -101,82 +108,128 @@ body {
 
 .marquee-label h3 {
   margin: 0;
+
   font-size: 17px;
   font-weight: 700;
 }
+
+/* ========================================
+   Marquee
+======================================== */
 
 .marquee-wrapper {
   width: 100%;
   overflow: hidden;
 
+  padding: 10px 0 20px;
+
   -webkit-mask-image: linear-gradient(
     to right,
     transparent,
-    black 8%,
-    black 92%,
+    black 5%,
+    black 95%,
     transparent
   );
 
   mask-image: linear-gradient(
     to right,
     transparent,
-    black 8%,
-    black 92%,
+    black 5%,
+    black 95%,
     transparent
   );
 }
 
 .marquee-track {
   display: flex;
+  align-items: flex-start;
+
   width: max-content;
-  gap: 18px;
+
   animation: nextpeer-marquee 35s linear infinite;
   will-change: transform;
 }
 
-.marquee-track.marquee-reverse {
-  animation-direction: reverse;
-  animation-duration: 40s;
+/* ========================================
+   University Logo
+======================================== */
+
+.university-logo-track {
+  gap: 65px;
 }
 
-.marquee-card {
-  min-width: 190px;
-  height: 82px;
-  padding: 0 28px;
+.university-logo-item {
+  width: 190px;
+  flex: 0 0 190px;
 
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
 
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  border-radius: 18px;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 
-  background: rgba(128, 128, 128, 0.05);
+  padding: 0 !important;
+}
 
-  font-size: 17px;
+/*
+  This area gives every logo enough room
+  without cropping it.
+*/
+
+.university-logo-image {
+  position: relative;
+
+  width: 180px;
+  height: 110px;
+
+  display: block;
+
+  overflow: visible !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.university-logo-image img {
+  object-fit: contain !important;
+  object-position: center !important;
+
+  padding: 0 !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.university-logo {
+  object-fit: contain !important;
+  object-position: center !important;
+}
+
+/* University name */
+
+.university-logo-name {
+  width: 100%;
+
+  margin: 14px 0 0;
+
+  color: var(--foreground);
+
+  font-size: 14px;
+  line-height: 1.35;
   font-weight: 700;
-  white-space: nowrap;
-
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.marquee-card:hover {
-  border-color: #2563eb;
-  transform: translateY(-2px);
-}
-
-.marquee-disclaimer {
-  max-width: 850px;
-  margin: 42px auto 0;
-  padding: 0 24px;
 
   text-align: center;
-  font-size: 11px;
-  line-height: 1.6;
-  opacity: 0.45;
+  white-space: normal;
 }
+
+/* ========================================
+   Animation
+======================================== */
 
 @keyframes nextpeer-marquee {
   from {
@@ -184,19 +237,21 @@ body {
   }
 
   to {
-    transform: translateX(calc(-50% - 9px));
+    transform: translateX(calc(-50% - 32.5px));
   }
 }
 
-/* Mobile */
+/* ========================================
+   Mobile
+======================================== */
 
 @media (max-width: 768px) {
   .campus-career-section {
-    padding: 65px 0;
+    padding: 60px 0 70px;
   }
 
   .campus-career-heading {
-    margin-bottom: 45px;
+    margin-bottom: 40px;
   }
 
   .campus-career-heading h2 {
@@ -207,92 +262,16 @@ body {
     font-size: 15px;
   }
 
+  .marquee-label {
+    margin-bottom: 28px;
+  }
+
   .marquee-label h3 {
     font-size: 15px;
   }
 
-  .marquee-card {
-    min-width: 155px;
-    height: 70px;
-    padding: 0 20px;
-    font-size: 15px;
-  }
-
-  .marquee-track {
-    gap: 12px;
-    animation-duration: 28s;
-  }
-
-  .marquee-track.marquee-reverse {
-    animation-duration: 32s;
-  }
-}
-
-/* Accessibility */
-
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation-play-state: paused;
-  }
-}
-
-/* University logo marquee - clean logo version */
-
-.university-logo-track {
-  align-items: flex-start;
-  gap: 55px;
-}
-
-.university-logo-item {
-  width: 190px;
-  flex: 0 0 190px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-
-  background: transparent;
-  border: none;
-  box-shadow: none;
-
-  text-align: center;
-}
-
-.university-logo-image {
-  position: relative;
-
-  width: 180px;
-  height: 105px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.university-logo {
-  object-fit: contain !important;
-  object-position: center !important;
-
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.university-logo-name {
-  margin: 14px 0 0;
-
-  font-size: 15px;
-  line-height: 1.3;
-  font-weight: 700;
-
-  color: var(--foreground);
-
-  white-space: normal;
-}
-
-@media (max-width: 768px) {
   .university-logo-track {
-    gap: 32px;
+    gap: 40px;
   }
 
   .university-logo-item {
@@ -302,11 +281,23 @@ body {
 
   .university-logo-image {
     width: 145px;
-    height: 85px;
+    height: 90px;
   }
 
   .university-logo-name {
     margin-top: 10px;
     font-size: 13px;
+  }
+
+  .marquee-track {
+    animation-duration: 27s;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation-play-state: paused;
   }
 }
