@@ -6,6 +6,7 @@ import Hero from "@/components/sections/Hero";
 import FeatureHighlights from "@/components/sections/FeatureHighlights";
 import CampusCareerMarquee from "@/components/sections/CampusCareerMarquee";
 import CareerPaths from "@/components/sections/CareerPaths";
+import HowNextPeerWorks from "@/components/sections/HowNextPeerWorks";
 
 export const metadata: Metadata = {
   title: "NextPeer | Career-Focused Courses for College Students",
@@ -26,6 +27,7 @@ export default function Home() {
         <FeatureHighlights />
         <CampusCareerMarquee />
         <CareerPaths />
+        <HowNextPeerWorks />
       </main>
 
       <Footer />
