@@ -53,8 +53,26 @@ const values = [
 
 const openings = [
   {
-    title: "Business Development Intern",
+    title: "Business Development Manager",
+    team: "Business Development",
+    location: "Remote",
+    type: "Full-Time",
+  },
+  {
+    title: "Business Development Executive",
+    team: "Business Development",
+    location: "Remote",
+    type: "Full-Time",
+  },
+  {
+    title: "Lead Generation Specialist",
     team: "Growth",
+    location: "Remote",
+    type: "Full-Time",
+  },
+  {
+    title: "Business Development Intern",
+    team: "Business Development",
     location: "Remote",
     type: "Internship",
   },
