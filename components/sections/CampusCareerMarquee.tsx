@@ -1,52 +1,41 @@
+import Image from "next/image";
+
 const universities = [
-  "IIT Delhi",
-  "IIT Bombay",
-  "IIT Madras",
-  "IIT Kanpur",
-  "NIT Trichy",
-  "NIT Warangal",
-  "VIT",
-  "SRM University",
-  "Manipal University",
-  "Amity University",
-  "Chandigarh University",
-  "Lovely Professional University",
+  { name: "IIT Bombay", logo: "/logos/iit-bombay.png" },
+  { name: "IIT Delhi", logo: "/logos/iit-delhi.png" },
+  { name: "IIT Madras", logo: "/logos/iit-madras.png" },
+  { name: "IIT Kanpur", logo: "/logos/iit-kanpur.png" },
+  { name: "NIT Trichy", logo: "/logos/nit-trichy.png" },
+  { name: "NIT Warangal", logo: "/logos/nit-warangal.png" },
+  { name: "VIT", logo: "/logos/vit.png" },
+  { name: "SRM University", logo: "/logos/srm.png" },
+  { name: "Manipal University", logo: "/logos/manipal.png" },
+  { name: "Amity University", logo: "/logos/amity.png" },
+  {
+    name: "Chandigarh University",
+    logo: "/logos/chandigarh-university.png",
+  },
+  { name: "Lovely Professional University", logo: "/logos/lpu.png" },
 ];
 
-const companies = [
-  "Google",
-  "Microsoft",
-  "Amazon",
-  "OpenAI",
-  "NVIDIA",
-  "Adobe",
-  "IBM",
-  "Accenture",
-  "Deloitte",
-  "TCS",
-  "Infosys",
-  "Wipro",
-];
-
-function MarqueeRow({
-  items,
-  reverse = false,
-}: {
-  items: string[];
-  reverse?: boolean;
-}) {
-  const repeatedItems = [...items, ...items];
+function UniversityMarquee() {
+  const repeatedUniversities = [...universities, ...universities];
 
   return (
     <div className="marquee-wrapper">
-      <div
-        className={`marquee-track ${
-          reverse ? "marquee-reverse" : ""
-        }`}
-      >
-        {repeatedItems.map((item, index) => (
-          <div className="marquee-card" key={`${item}-${index}`}>
-            <span>{item}</span>
+      <div className="marquee-track">
+        {repeatedUniversities.map((university, index) => (
+          <div
+            className="marquee-card marquee-logo-card"
+            key={`${university.name}-${index}`}
+          >
+            <Image
+              src={university.logo}
+              alt={`${university.name} logo`}
+              width={170}
+              height={60}
+              className="marquee-logo"
+            />
           </div>
         ))}
       </div>
@@ -58,42 +47,29 @@ export default function CampusCareerMarquee() {
   return (
     <section className="campus-career-section">
       <div className="campus-career-heading">
-        <span className="campus-eyebrow">BUILT FOR AMBITIOUS STUDENTS</span>
+        <span className="campus-eyebrow">
+          BUILT FOR AMBITIOUS STUDENTS
+        </span>
 
         <h2>
-          Learn skills for opportunities across
-          <span> leading universities & companies</span>
+          Learning built for students across
+          <span> leading colleges & universities</span>
         </h2>
 
         <p>
-          Career-focused learning designed for college students preparing
-          for the modern technology industry.
+          Practical, career-focused learning designed to help college
+          students build industry-relevant technology skills.
         </p>
       </div>
 
       <div className="marquee-group">
         <div className="marquee-label">
           <span>🎓</span>
-          <h3>Built for students across leading colleges & universities</h3>
+          <h3>Students from colleges & universities across India</h3>
         </div>
 
-        <MarqueeRow items={universities} />
+        <UniversityMarquee />
       </div>
-
-      <div className="marquee-group company-group">
-        <div className="marquee-label">
-          <span>🚀</span>
-          <h3>Build skills for careers at leading technology companies</h3>
-        </div>
-
-        <MarqueeRow items={companies} reverse />
-      </div>
-
-      <p className="marquee-disclaimer">
-        Institution and company names are shown for educational and career
-        context only and do not imply partnership, endorsement, enrollment,
-        hiring, or placement by NextPeer.
-      </p>
     </section>
   );
 }
