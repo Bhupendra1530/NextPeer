@@ -26,7 +26,7 @@ body {
 }
 
 /* ========================================
-   NextPeer University Marquee
+   NEXTPeer University Section
 ======================================== */
 
 .campus-career-section {
@@ -42,8 +42,12 @@ body {
     var(--background);
 }
 
+/* ========================================
+   Main Heading
+======================================== */
+
 .campus-career-heading {
-  max-width: 850px;
+  max-width: 900px;
   margin: 0 auto 55px;
   padding: 0 24px;
   text-align: center;
@@ -51,6 +55,7 @@ body {
 
 .campus-eyebrow {
   display: inline-block;
+
   margin-bottom: 16px;
 
   color: #2563eb;
@@ -75,6 +80,7 @@ body {
 
 .campus-career-heading p {
   max-width: 650px;
+
   margin: 20px auto 0;
 
   font-size: 17px;
@@ -83,7 +89,9 @@ body {
   opacity: 0.7;
 }
 
-/* Section title */
+/* ========================================
+   University Section Heading
+======================================== */
 
 .marquee-group {
   margin-top: 40px;
@@ -91,12 +99,13 @@ body {
 
 .marquee-label {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 
   gap: 10px;
 
-  margin-bottom: 35px;
+  margin-bottom: 45px;
+
   padding: 0 20px;
 
   text-align: center;
@@ -114,75 +123,98 @@ body {
 }
 
 /* ========================================
-   Marquee
+   Marquee Container
 ======================================== */
 
 .marquee-wrapper {
   width: 100%;
+
   overflow: hidden;
 
-  padding: 10px 0 20px;
+  padding: 10px 0 25px;
 
   -webkit-mask-image: linear-gradient(
     to right,
     transparent,
-    black 5%,
-    black 95%,
+    black 4%,
+    black 96%,
     transparent
   );
 
   mask-image: linear-gradient(
     to right,
     transparent,
-    black 5%,
-    black 95%,
+    black 4%,
+    black 96%,
     transparent
   );
 }
 
+/* ========================================
+   Sliding Track
+======================================== */
+
 .marquee-track {
   display: flex;
+
   align-items: flex-start;
 
   width: max-content;
 
-  animation: nextpeer-marquee 35s linear infinite;
+  animation: nextpeer-marquee 40s linear infinite;
+
   will-change: transform;
 }
 
 /* ========================================
-   University Logo
+   University Track
 ======================================== */
 
 .university-logo-track {
-  gap: 65px;
+  gap: 110px;
 }
+
+/* ========================================
+   Individual University
+======================================== */
 
 .university-logo-item {
-  width: 190px;
-  flex: 0 0 190px;
+  width: 220px;
+
+  flex: 0 0 220px;
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
 
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+  justify-content: flex-start;
 
   padding: 0 !important;
+
+  margin: 0;
+
+  background: transparent !important;
+
+  border: none !important;
+
+  border-radius: 0 !important;
+
+  box-shadow: none !important;
+
+  text-align: center;
 }
 
-/*
-  This area gives every logo enough room
-  without cropping it.
-*/
+/* ========================================
+   Logo Area
+======================================== */
 
 .university-logo-image {
   position: relative;
 
   width: 180px;
+
   height: 110px;
 
   display: block;
@@ -190,40 +222,67 @@ body {
   overflow: visible !important;
 
   background: transparent !important;
-  border: 0 !important;
+
+  border: none !important;
+
   border-radius: 0 !important;
+
+  box-shadow: none !important;
 }
+
+/* ========================================
+   Actual Logo Image
+======================================== */
 
 .university-logo-image img {
   object-fit: contain !important;
+
   object-position: center !important;
+
+  width: 100% !important;
+
+  height: 100% !important;
 
   padding: 0 !important;
 
+  margin: 0 !important;
+
   background: transparent !important;
-  border: 0 !important;
+
+  border: none !important;
+
   border-radius: 0 !important;
+
+  box-shadow: none !important;
 }
 
 .university-logo {
   object-fit: contain !important;
+
   object-position: center !important;
 }
 
-/* University name */
+/* ========================================
+   University Name
+======================================== */
 
 .university-logo-name {
   width: 100%;
 
-  margin: 14px 0 0;
+  margin: 16px 0 0;
+
+  padding: 0;
 
   color: var(--foreground);
 
-  font-size: 14px;
+  font-size: 15px;
+
   line-height: 1.35;
+
   font-weight: 700;
 
   text-align: center;
+
   white-space: normal;
 }
 
@@ -237,8 +296,16 @@ body {
   }
 
   to {
-    transform: translateX(calc(-50% - 32.5px));
+    transform: translateX(calc(-50% - 55px));
   }
+}
+
+/* ========================================
+   Pause Animation on Hover
+======================================== */
+
+.marquee-wrapper:hover .marquee-track {
+  animation-play-state: paused;
 }
 
 /* ========================================
@@ -246,12 +313,15 @@ body {
 ======================================== */
 
 @media (max-width: 768px) {
+
   .campus-career-section {
     padding: 60px 0 70px;
   }
 
   .campus-career-heading {
     margin-bottom: 40px;
+
+    padding: 0 18px;
   }
 
   .campus-career-heading h2 {
@@ -262,41 +332,71 @@ body {
     font-size: 15px;
   }
 
+  .marquee-group {
+    margin-top: 35px;
+  }
+
   .marquee-label {
-    margin-bottom: 28px;
+    margin-bottom: 35px;
+
+    padding: 0 18px;
+  }
+
+  .marquee-label span {
+    font-size: 20px;
   }
 
   .marquee-label h3 {
     font-size: 15px;
   }
 
+  .marquee-wrapper {
+    padding: 5px 0 20px;
+  }
+
   .university-logo-track {
-    gap: 40px;
+    gap: 65px;
   }
 
   .university-logo-item {
-    width: 150px;
-    flex-basis: 150px;
+    width: 170px;
+
+    flex: 0 0 170px;
   }
 
   .university-logo-image {
-    width: 145px;
+    width: 150px;
+
     height: 90px;
   }
 
   .university-logo-name {
-    margin-top: 10px;
+    margin-top: 12px;
+
     font-size: 13px;
   }
 
   .marquee-track {
-    animation-duration: 27s;
+    animation-duration: 30s;
+  }
+
+  @keyframes nextpeer-marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-50% - 32.5px));
+    }
   }
 }
 
-/* Accessibility */
+/* ========================================
+   Reduced Motion Accessibility
+======================================== */
 
 @media (prefers-reduced-motion: reduce) {
+
   .marquee-track {
     animation-play-state: paused;
   }
