@@ -229,13 +229,13 @@ export default function CareersPage() {
                     </div>
                   </div>
 
-                  <Link
-                    href="/careers/apply"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition-all group-hover:border-blue-600 group-hover:bg-blue-600 group-hover:text-white"
-                  >
-                    Apply Now
-                    <ArrowRight size={16} />
-                  </Link>
+                 <Link
+  href={`/careers/apply?role=${encodeURIComponent(role.title)}`}
+  className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-700 transition-all group-hover:border-blue-600 group-hover:bg-blue-600 group-hover:text-white"
+>
+  Apply Now
+  <ArrowRight size={16} />
+</Link>
                 </div>
               ))}
             </div>
