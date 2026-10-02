@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type Employee = {
@@ -31,12 +31,73 @@ type Dashboard = {
   attendance: Attendance[];
 };
 
+const OFFICE_START_HOUR = 11;
+
+function formatTime(value: string | null) {
+  if (!value) return "—";
+
+  return new Date(value).toLocaleTimeString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getLateMinutes(record?: Attendance) {
+  if (!record) return null;
+
+  // Office starts at 11:00 AM IST.
+  const officeStart = new Date(
+    `${record.attendance_date}T${String(
+      OFFICE_START_HOUR
+    ).padStart(2, "0")}:00:00+05:30`
+  );
+
+  const checkIn = new Date(record.check_in_at);
+
+  if (
+    !Number.isFinite(officeStart.getTime()) ||
+    !Number.isFinite(checkIn.getTime())
+  ) {
+    return null;
+  }
+
+  return Math.max(
+    0,
+    Math.floor(
+      (checkIn.getTime() - officeStart.getTime()) / 60000
+    )
+  );
+}
+
+function getWorkingHours(record?: Attendance) {
+  if (!record) return "—";
+  if (!record.check_out_at) return "In progress";
+
+  const start = new Date(record.check_in_at).getTime();
+  const end = new Date(record.check_out_at).getTime();
+
+  if (!Number.isFinite(start) || !Number.isFinite(end)) {
+    return "—";
+  }
+
+  const minutes = Math.max(
+    0,
+    Math.floor((end - start) / 60000)
+  );
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  return `${hours}h ${remainingMinutes}m`;
+}
+
 export default function HRDashboardPage() {
   const [data, setData] = useState<Dashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadDashboard() {
+  const loadDashboard = useCallback(async () => {
     setLoading(true);
     setError("");
 
@@ -75,21 +136,11 @@ export default function HRDashboardPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     void loadDashboard();
-  }, []);
-
-  function formatTime(value: string | null) {
-    if (!value) return "—";
-
-    return new Date(value).toLocaleTimeString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
+  }, [loadDashboard]);
 
   return (
     <main className="mx-auto max-w-7xl p-6">
@@ -106,10 +157,15 @@ export default function HRDashboardPage() {
           <p className="mt-2 text-gray-500">
             Daily employee attendance overview
           </p>
+
+          <p className="mt-2 text-sm text-gray-500">
+            Office timing: 11:00 AM – 7:00 PM IST
+          </p>
         </div>
 
         <button
-          onClick={loadDashboard}
+          type="button"
+          onClick={() => void loadDashboard()}
           disabled={loading}
           className="rounded-lg bg-blue-600 px-5 py-3 text-white disabled:opacity-50"
         >
@@ -122,7 +178,10 @@ export default function HRDashboardPage() {
       )}
 
       {error && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700">
+        <div
+          role="alert"
+          className="rounded-xl border border-red-200 bg-red-50 p-5 text-red-700"
+        >
           {error}
         </div>
       )}
@@ -178,6 +237,8 @@ export default function HRDashboardPage() {
                     <th className="p-4">Department</th>
                     <th className="p-4">Check In</th>
                     <th className="p-4">Check Out</th>
+                    <th className="p-4">Late Arrival</th>
+                    <th className="p-4">Working Hours</th>
                     <th className="p-4">Status</th>
                   </tr>
                 </thead>
@@ -188,6 +249,9 @@ export default function HRDashboardPage() {
                       (row) =>
                         row.employee_id === employee.id
                     );
+
+                    const lateMinutes =
+                      getLateMinutes(record);
 
                     const status = !record
                       ? "Not checked in"
@@ -226,7 +290,33 @@ export default function HRDashboardPage() {
                         </td>
 
                         <td className="p-4">
-                          <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">
+                          {lateMinutes === null ? (
+                            "—"
+                          ) : lateMinutes === 0 ? (
+                            <span className="font-medium text-green-600">
+                              On time
+                            </span>
+                          ) : (
+                            <span className="font-medium text-red-600">
+                              {lateMinutes} min late
+                            </span>
+                          )}
+                        </td>
+
+                        <td className="p-4 font-medium">
+                          {getWorkingHours(record)}
+                        </td>
+
+                        <td className="p-4">
+                          <span
+                            className={`rounded-full px-3 py-1 ${
+                              status === "Checked out"
+                                ? "bg-blue-50 text-blue-700"
+                                : status === "Working"
+                                  ? "bg-green-50 text-green-700"
+                                  : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
                             {status}
                           </span>
                         </td>
