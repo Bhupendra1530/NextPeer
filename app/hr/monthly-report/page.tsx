@@ -12,6 +12,7 @@ type EmployeeReport = {
   department: string | null;
   scheduledDays: number;
   presentDays: number;
+  approvedLeaveDays: number;
   absentDays: number;
   lateDays: number;
   totalLateMinutes: number;
@@ -29,6 +30,7 @@ type MonthlyReport = {
     totalEmployees: number;
     scheduledDays: number;
     totalPresentDays: number;
+    totalApprovedLeaveDays: number;
     totalAbsentDays: number;
   };
   employees: EmployeeReport[];
@@ -152,6 +154,7 @@ export default function MonthlyReportPage() {
       "Department",
       "Scheduled Days",
       "Present Days",
+      "Approved Leave Days",
       "Days Without Check-in",
       "Late Days",
       "Total Late Minutes",
@@ -166,6 +169,7 @@ export default function MonthlyReportPage() {
       employee.department ?? "",
       employee.scheduledDays,
       employee.presentDays,
+      employee.approvedLeaveDays,
       employee.absentDays,
       employee.lateDays,
       employee.totalLateMinutes,
@@ -208,7 +212,7 @@ export default function MonthlyReportPage() {
           </h1>
 
           <p className="mt-2 text-gray-500">
-            Employee attendance, working hours and late
+            Employee attendance, approved leave, working hours and late
             arrivals
           </p>
         </div>
@@ -301,7 +305,7 @@ export default function MonthlyReportPage() {
 
           {/* Summary cards */}
 
-          <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {[
               {
                 title: "Total Employees",
@@ -314,6 +318,10 @@ export default function MonthlyReportPage() {
               {
                 title: "Total Days Present",
                 value: report.summary.totalPresentDays,
+              },
+              {
+                title: "Approved Leave Days",
+                value: report.summary.totalApprovedLeaveDays,
               },
               {
                 title: "Days Without Check-in",
@@ -356,6 +364,7 @@ export default function MonthlyReportPage() {
                     <th className="p-4">Department</th>
                     <th className="p-4">Working Days</th>
                     <th className="p-4">Present</th>
+                    <th className="p-4">Approved Leave</th>
                     <th className="p-4">No Check-in</th>
                     <th className="p-4">Late Days</th>
                     <th className="p-4">Late Time</th>
@@ -390,6 +399,10 @@ export default function MonthlyReportPage() {
 
                       <td className="p-4 font-semibold text-green-700">
                         {employee.presentDays}
+                      </td>
+
+                      <td className="p-4 font-semibold text-blue-600">
+                        {employee.approvedLeaveDays}
                       </td>
 
                       <td className="p-4 font-semibold text-red-600">
@@ -431,10 +444,11 @@ export default function MonthlyReportPage() {
           <p className="mt-5 text-sm text-gray-500">
             Mondays and future dates are excluded from
             scheduled working days. Days without a check-in
-            are not necessarily payroll absences; approved
-            leave and employee joining dates are not yet
-            included. Working hours exclude ongoing shifts
-            and do not deduct breaks.
+            exclude approved leave, but are not necessarily
+            payroll absences. Employee joining dates are not
+            yet included. Approved leave is counted only on
+            scheduled days without a check-in. Working hours
+            exclude ongoing shifts and do not deduct breaks.
           </p>
         </>
       )}
