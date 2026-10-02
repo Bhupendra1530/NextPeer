@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function EmployeeAttendancePage() {
@@ -12,33 +11,138 @@ export default function EmployeeAttendancePage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [checkedIn, setCheckedIn] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
-  const cameraRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const previewRef = useRef<string | null>(null);
+  const submittingRef = useRef(false);
 
-  const captureSelfie = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  // Release camera and preview resources.
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach(
+        (track) => track.stop()
+      );
+      if (previewRef.current) {
+        URL.revokeObjectURL(previewRef.current);
+      }
+    };
+  }, []);
 
+  // Attach the camera stream after video is rendered.
+  useEffect(() => {
     if (
-      !["image/jpeg", "image/png", "image/webp"].includes(
-        file.type
-      )
+      cameraOpen &&
+      videoRef.current &&
+      streamRef.current
     ) {
-      setMessage("Please capture a JPG, PNG or WebP image.");
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {
+        setMessage("Unable to start the camera preview.");
+      });
+    }
+  }, [cameraOpen]);
+
+  const closeCamera = () => {
+    streamRef.current?.getTracks().forEach(
+      (track) => track.stop()
+    );
+    streamRef.current = null;
+    setCameraOpen(false);
+  };
+
+  const openCamera = async () => {
+    try {
+      setMessage("Opening your camera...");
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error(
+          "Your browser does not support camera access."
+        );
+      }
+
+      closeCamera();
+
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: "user",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+
+      streamRef.current = stream;
+      setCameraOpen(true);
+      setMessage("");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Camera access failed."
+      );
+    }
+  };
+
+  const takeSelfie = () => {
+    const video = videoRef.current;
+
+    if (!video || video.videoWidth === 0) {
+      setMessage("Camera is not ready. Try again.");
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage("Selfie must be smaller than 5 MB.");
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      setMessage("Unable to capture your selfie.");
       return;
     }
 
-    setSelfie(file);
-    setPreview(URL.createObjectURL(file));
-    setLocation(null);
-    setMessage("Selfie captured. Now verify your location.");
+    context.drawImage(video, 0, 0);
+
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          setMessage("Selfie capture failed.");
+          return;
+        }
+
+        if (blob.size > 5 * 1024 * 1024) {
+          setMessage("Selfie exceeds the 5 MB limit.");
+          return;
+        }
+
+        const file = new File(
+          [blob],
+          "attendance-selfie.jpg",
+          { type: "image/jpeg" }
+        );
+
+        if (previewRef.current) {
+          URL.revokeObjectURL(previewRef.current);
+        }
+
+        const url = URL.createObjectURL(file);
+        previewRef.current = url;
+
+        setSelfie(file);
+        setPreview(url);
+        setLocation(null);
+        closeCamera();
+        setMessage(
+          "Selfie captured! Now verify your GPS location."
+        );
+      },
+      "image/jpeg",
+      0.85
+    );
   };
 
   const getLocation = () => {
@@ -55,17 +159,18 @@ export default function EmployeeAttendancePage() {
       (position) => {
         if (position.coords.accuracy > 200) {
           setMessage(
-            "GPS accuracy is too low. Move to an open area and try again."
+            "GPS accuracy is too low. Try moving near a window or outdoors."
           );
         } else {
           setLocation(position);
-          setMessage("Location verified successfully.");
+          setMessage("Location captured successfully.");
         }
+
         setLoading(false);
       },
       () => {
         setMessage(
-          "Unable to get location. Enable GPS and allow location access."
+          "Unable to get location. Enable location permissions and try again."
         );
         setLoading(false);
       },
@@ -78,15 +183,16 @@ export default function EmployeeAttendancePage() {
   };
 
   const checkIn = async () => {
-    if (loading || checkedIn) return;
+    if (submittingRef.current || checkedIn) return;
 
     if (!selfie || !location) {
-      setMessage("Selfie and GPS location are required.");
+      setMessage("Capture your selfie and GPS location first.");
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
-    setMessage("Submitting your attendance...");
+    setMessage("Recording your attendance...");
 
     try {
       const {
@@ -100,11 +206,10 @@ export default function EmployeeAttendancePage() {
         );
       }
 
-      // Require a recent location reading.
       if (Date.now() - location.timestamp > 60000) {
         setLocation(null);
         throw new Error(
-          "Your location has expired. Please verify GPS again."
+          "GPS location expired. Please verify again."
         );
       }
 
@@ -139,6 +244,10 @@ export default function EmployeeAttendancePage() {
       const result = await response.json();
 
       if (!response.ok) {
+        if (response.status === 409) {
+          setCheckedIn(true);
+        }
+
         throw new Error(
           result.error || "Unable to record attendance."
         );
@@ -155,6 +264,7 @@ export default function EmployeeAttendancePage() {
           : "Something went wrong."
       );
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
@@ -181,25 +291,48 @@ export default function EmployeeAttendancePage() {
             1. Capture your selfie
           </h2>
 
-          <input
-            ref={cameraRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            capture="user"
-            onChange={captureSelfie}
-            className="hidden"
-          />
+          {!cameraOpen && !checkedIn && (
+            <button
+              type="button"
+              onClick={openCamera}
+              disabled={loading}
+              className="rounded-lg bg-blue-600 px-5 py-3 text-white disabled:opacity-50"
+            >
+              {selfie ? "Retake Selfie" : "Open Camera"}
+            </button>
+          )}
 
-          <button
-            type="button"
-            disabled={loading || checkedIn}
-            onClick={() => cameraRef.current?.click()}
-            className="rounded-lg bg-blue-600 px-5 py-3 text-white disabled:opacity-50"
-          >
-            Open Camera
-          </button>
+          {cameraOpen && (
+            <div className="mt-4 space-y-3">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full rounded-xl bg-black"
+              />
 
-          {preview && (
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={takeSelfie}
+                  className="rounded-lg bg-blue-600 px-5 py-3 text-white"
+                >
+                  Take Selfie
+                </button>
+
+                <button
+                  type="button"
+                  onClick={closeCamera}
+                  className="rounded-lg border px-5 py-3"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {preview && !cameraOpen && (
             <img
               src={preview}
               alt="Your attendance selfie"
@@ -238,13 +371,14 @@ export default function EmployeeAttendancePage() {
           disabled={
             loading ||
             checkedIn ||
+            cameraOpen ||
             !selfie ||
             !location
           }
           className="w-full rounded-xl bg-green-600 p-4 font-semibold text-white disabled:opacity-50"
         >
           {checkedIn
-            ? "Checked In Successfully"
+            ? "Already Checked In"
             : loading
               ? "Processing..."
               : "Clock In"}
