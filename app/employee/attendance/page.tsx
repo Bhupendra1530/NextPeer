@@ -1,36 +1,98 @@
+
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
+type Attendance = {
+  id: string;
+  check_in_at: string;
+  check_out_at: string | null;
+  late_minutes: number;
+  worked_minutes: number;
+  status: string;
+};
+
 export default function EmployeeAttendancePage() {
+  const [attendance, setAttendance] =
+    useState<Attendance | null>(null);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [selfie, setSelfie] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [location, setLocation] =
     useState<GeolocationPosition | null>(null);
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [checkedIn, setCheckedIn] = useState(false);
-  const [cameraOpen, setCameraOpen] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const previewRef = useRef<string | null>(null);
   const submittingRef = useRef(false);
 
-  // Release camera and preview resources.
+  const checkedIn = Boolean(attendance);
+  const checkedOut = Boolean(attendance?.check_out_at);
+
+  const loadAttendance = useCallback(async () => {
+    setStatusLoading(true);
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error(
+          "Please log in to your NextPeer account."
+        );
+      }
+
+      const response = await fetch(
+        "/api/attendance/status",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${session.access_token}`,
+          },
+          cache: "no-store",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Unable to load attendance."
+        );
+      }
+
+      setAttendance(data.attendance ?? null);
+      setMessage("");
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to load attendance."
+      );
+    } finally {
+      setStatusLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
+    void loadAttendance();
+
     return () => {
       streamRef.current?.getTracks().forEach(
         (track) => track.stop()
       );
+
       if (previewRef.current) {
         URL.revokeObjectURL(previewRef.current);
       }
     };
-  }, []);
+  }, [loadAttendance]);
 
-  // Attach the camera stream after video is rendered.
   useEffect(() => {
     if (
       cameraOpen &&
@@ -39,7 +101,7 @@ export default function EmployeeAttendancePage() {
     ) {
       videoRef.current.srcObject = streamRef.current;
       videoRef.current.play().catch(() => {
-        setMessage("Unable to start the camera preview.");
+        setMessage("Unable to start camera preview.");
       });
     }
   }, [cameraOpen]);
@@ -54,7 +116,7 @@ export default function EmployeeAttendancePage() {
 
   const openCamera = async () => {
     try {
-      setMessage("Opening your camera...");
+      setMessage("");
 
       if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error(
@@ -76,7 +138,6 @@ export default function EmployeeAttendancePage() {
 
       streamRef.current = stream;
       setCameraOpen(true);
-      setMessage("");
     } catch (error) {
       setMessage(
         error instanceof Error
@@ -89,8 +150,8 @@ export default function EmployeeAttendancePage() {
   const takeSelfie = () => {
     const video = videoRef.current;
 
-    if (!video || video.videoWidth === 0) {
-      setMessage("Camera is not ready. Try again.");
+    if (!video || !video.videoWidth) {
+      setMessage("Camera is not ready.");
       return;
     }
 
@@ -99,23 +160,14 @@ export default function EmployeeAttendancePage() {
     canvas.height = video.videoHeight;
 
     const context = canvas.getContext("2d");
-
-    if (!context) {
-      setMessage("Unable to capture your selfie.");
-      return;
-    }
+    if (!context) return;
 
     context.drawImage(video, 0, 0);
 
     canvas.toBlob(
       (blob) => {
-        if (!blob) {
-          setMessage("Selfie capture failed.");
-          return;
-        }
-
-        if (blob.size > 5 * 1024 * 1024) {
-          setMessage("Selfie exceeds the 5 MB limit.");
+        if (!blob || blob.size > 5 * 1024 * 1024) {
+          setMessage("Unable to capture a valid selfie.");
           return;
         }
 
@@ -136,8 +188,9 @@ export default function EmployeeAttendancePage() {
         setPreview(url);
         setLocation(null);
         closeCamera();
+
         setMessage(
-          "Selfie captured! Now verify your GPS location."
+          "Selfie captured. Verify your location."
         );
       },
       "image/jpeg",
@@ -147,30 +200,29 @@ export default function EmployeeAttendancePage() {
 
   const getLocation = () => {
     if (!navigator.geolocation) {
-      setMessage("GPS is not supported on this device.");
+      setMessage("GPS is not supported.");
       return;
     }
 
     setLoading(true);
     setLocation(null);
-    setMessage("Getting your current location...");
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         if (position.coords.accuracy > 200) {
           setMessage(
-            "GPS accuracy is too low. Try moving near a window or outdoors."
+            "GPS accuracy is too low. Please try again."
           );
         } else {
           setLocation(position);
-          setMessage("Location captured successfully.");
+          setMessage("Location verified.");
         }
 
         setLoading(false);
       },
       () => {
         setMessage(
-          "Unable to get location. Enable location permissions and try again."
+          "Enable location permission and try again."
         );
         setLoading(false);
       },
@@ -182,35 +234,31 @@ export default function EmployeeAttendancePage() {
     );
   };
 
-  const checkIn = async () => {
-    if (submittingRef.current || checkedIn) return;
+  const submitAttendance = async () => {
+    if (submittingRef.current || checkedOut) return;
 
     if (!selfie || !location) {
-      setMessage("Capture your selfie and GPS location first.");
+      setMessage("Selfie and GPS are required.");
       return;
     }
 
     submittingRef.current = true;
     setLoading(true);
-    setMessage("Recording your attendance...");
 
     try {
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      if (sessionError || !session) {
-        throw new Error(
-          "Please log in to your NextPeer account."
-        );
-      }
-
       if (Date.now() - location.timestamp > 60000) {
         setLocation(null);
         throw new Error(
-          "GPS location expired. Please verify again."
+          "GPS location expired. Verify again."
         );
+      }
+
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error("Please log in first.");
       }
 
       const form = new FormData();
@@ -229,33 +277,43 @@ export default function EmployeeAttendancePage() {
         String(location.coords.accuracy)
       );
 
-      const response = await fetch(
-        "/api/attendance/check-in",
-        {
-          method: "POST",
-          headers: {
-            Authorization:
-              `Bearer ${session.access_token}`,
-          },
-          body: form,
-        }
-      );
+      const endpoint = checkedIn
+        ? "/api/attendance/check-out"
+        : "/api/attendance/check-in";
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization:
+            `Bearer ${session.access_token}`,
+        },
+        body: form,
+      });
 
       const result = await response.json();
 
       if (!response.ok) {
-        if (response.status === 409) {
-          setCheckedIn(true);
-        }
-
         throw new Error(
-          result.error || "Unable to record attendance."
+          result.error || "Attendance submission failed."
         );
       }
 
-      setCheckedIn(true);
+      setSelfie(null);
+      setLocation(null);
+
+      if (previewRef.current) {
+        URL.revokeObjectURL(previewRef.current);
+        previewRef.current = null;
+      }
+
+      setPreview(null);
+
+      await loadAttendance();
+
       setMessage(
-        "Attendance recorded successfully! Have a productive day."
+        checkedIn
+          ? "Clock-out recorded successfully!"
+          : "Clock-in recorded successfully!"
       );
     } catch (error) {
       setMessage(
@@ -269,133 +327,220 @@ export default function EmployeeAttendancePage() {
     }
   };
 
+  const formatTime = (date: string) =>
+    new Intl.DateTimeFormat("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(new Date(date));
+
+  const formatDuration = (minutes: number) =>
+    `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+
   return (
     <main className="mx-auto max-w-xl p-6">
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-blue-600">
-          NEXTPeer / Employee Portal
-        </p>
+      <p className="text-sm font-semibold text-blue-600">
+        NEXTPeer / Employee Portal
+      </p>
 
-        <h1 className="mt-2 text-3xl font-bold">
-          Employee Attendance
-        </h1>
+      <h1 className="mt-2 text-3xl font-bold">
+        Employee Attendance
+      </h1>
 
-        <p className="mt-2 text-gray-500">
-          Office timing: 11:00 AM – 7:00 PM
-        </p>
-      </div>
+      <p className="mt-2 text-gray-500">
+        Office timing: 11:00 AM – 7:00 PM
+      </p>
 
-      <div className="space-y-6 rounded-2xl border p-5 shadow-sm">
-        <section>
-          <h2 className="mb-3 text-lg font-semibold">
-            1. Capture your selfie
-          </h2>
+      <div className="mt-6 space-y-5 rounded-2xl border p-5">
+        {statusLoading ? (
+          <p>Loading attendance...</p>
+        ) : (
+          <>
+            {attendance && (
+              <section className="rounded-xl bg-gray-50 p-4">
+                <h2 className="mb-4 text-lg font-semibold">
+                  Today&apos;s Attendance
+                </h2>
 
-          {!cameraOpen && !checkedIn && (
-            <button
-              type="button"
-              onClick={openCamera}
-              disabled={loading}
-              className="rounded-lg bg-blue-600 px-5 py-3 text-white disabled:opacity-50"
-            >
-              {selfie ? "Retake Selfie" : "Open Camera"}
-            </button>
-          )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      Clock In
+                    </p>
+                    <p className="font-semibold">
+                      {formatTime(attendance.check_in_at)}
+                    </p>
+                  </div>
 
-          {cameraOpen && (
-            <div className="mt-4 space-y-3">
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full rounded-xl bg-black"
-              />
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      Clock Out
+                    </p>
+                    <p className="font-semibold">
+                      {attendance.check_out_at
+                        ? formatTime(
+                            attendance.check_out_at
+                          )
+                        : "Not yet"}
+                    </p>
+                  </div>
 
-              <div className="flex gap-3">
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      Late Arrival
+                    </p>
+                    <p className="font-semibold">
+                      {attendance.late_minutes} min
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500">
+                      Working Hours
+                    </p>
+                    <p className="font-semibold">
+                      {checkedOut
+                        ? formatDuration(
+                            attendance.worked_minutes
+                          )
+                        : "In progress"}
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {!checkedOut && (
+              <>
+                <section>
+                  <h2 className="mb-3 text-lg font-semibold">
+                    1. Capture your selfie
+                  </h2>
+
+                  {!cameraOpen && (
+                    <button
+                      type="button"
+                      onClick={openCamera}
+                      disabled={loading}
+                      className="rounded-lg bg-blue-600 px-5 py-3 text-white disabled:opacity-50"
+                    >
+                      {selfie
+                        ? "Retake Selfie"
+                        : "Open Camera"}
+                    </button>
+                  )}
+
+                  {cameraOpen && (
+                    <div className="space-y-3">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        className="w-full rounded-xl bg-black"
+                      />
+
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={takeSelfie}
+                          className="rounded-lg bg-blue-600 px-4 py-3 text-white"
+                        >
+                          Take Selfie
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={closeCamera}
+                          className="rounded-lg border px-4 py-3"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {preview && !cameraOpen && (
+                    <img
+                      src={preview}
+                      alt="Attendance selfie"
+                      className="mt-4 h-48 w-48 rounded-xl object-cover"
+                    />
+                  )}
+                </section>
+
+                <section>
+                  <h2 className="mb-3 text-lg font-semibold">
+                    2. Verify your location
+                  </h2>
+
+                  <button
+                    type="button"
+                    onClick={getLocation}
+                    disabled={loading}
+                    className="rounded-lg bg-gray-900 px-5 py-3 text-white disabled:opacity-50"
+                  >
+                    Get My Location
+                  </button>
+
+                  {location && (
+                    <p className="mt-3 text-sm text-green-600">
+                      GPS captured. Accuracy:{" "}
+                      {Math.round(
+                        location.coords.accuracy
+                      )}{" "}
+                      metres
+                    </p>
+                  )}
+                </section>
+
                 <button
                   type="button"
-                  onClick={takeSelfie}
-                  className="rounded-lg bg-blue-600 px-5 py-3 text-white"
+                  onClick={submitAttendance}
+                  disabled={
+                    loading ||
+                    cameraOpen ||
+                    !selfie ||
+                    !location
+                  }
+                  className={`w-full rounded-xl p-4 font-semibold text-white disabled:opacity-50 ${
+                    checkedIn
+                      ? "bg-red-600"
+                      : "bg-green-600"
+                  }`}
                 >
-                  Take Selfie
+                  {loading
+                    ? "Processing..."
+                    : checkedIn
+                      ? "Clock Out"
+                      : "Clock In"}
                 </button>
+              </>
+            )}
 
-                <button
-                  type="button"
-                  onClick={closeCamera}
-                  className="rounded-lg border px-5 py-3"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-          {preview && !cameraOpen && (
-            <img
-              src={preview}
-              alt="Your attendance selfie"
-              className="mt-4 h-48 w-48 rounded-xl object-cover"
-            />
-          )}
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-lg font-semibold">
-            2. Verify your location
-          </h2>
-
-          <button
-            type="button"
-            onClick={getLocation}
-            disabled={loading || checkedIn}
-            className="rounded-lg bg-gray-900 px-5 py-3 text-white disabled:opacity-50"
-          >
-            {loading
-              ? "Please wait..."
-              : "Get My Location"}
-          </button>
-
-          {location && (
-            <p className="mt-3 text-sm text-green-600">
-              Location captured. Accuracy:{" "}
-              {Math.round(location.coords.accuracy)} metres
-            </p>
-          )}
-        </section>
-
-        <button
-          type="button"
-          onClick={checkIn}
-          disabled={
-            loading ||
-            checkedIn ||
-            cameraOpen ||
-            !selfie ||
-            !location
-          }
-          className="w-full rounded-xl bg-green-600 p-4 font-semibold text-white disabled:opacity-50"
-        >
-          {checkedIn
-            ? "Already Checked In"
-            : loading
-              ? "Processing..."
-              : "Clock In"}
-        </button>
+            {checkedOut && (
+              <p className="rounded-xl bg-green-50 p-4 text-center font-semibold text-green-700">
+                Today&apos;s attendance is complete.
+              </p>
+            )}
+          </>
+        )}
 
         {message && (
-          <p
-            role="status"
-            className={
-              checkedIn
-                ? "text-sm text-green-600"
-                : "text-sm text-gray-700"
-            }
-          >
+          <p role="status" className="text-sm">
             {message}
           </p>
         )}
+
+        <button
+          type="button"
+          onClick={loadAttendance}
+          disabled={statusLoading || loading}
+          className="text-sm text-blue-600 disabled:opacity-50"
+        >
+          Refresh Attendance
+        </button>
       </div>
     </main>
   );
