@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 const IST_OFFSET = "+05:30";
 const OFFICE_START_HOUR = 11;
+const PAGE_SIZE = 500;
 
 function todayInIndia() {
   const parts = new Intl.DateTimeFormat("en-GB", {
@@ -36,13 +37,12 @@ function datesInMonth(month: string) {
 }
 
 function isMonday(date: string) {
-  return new Date(`${date}T00:00:00Z`).getUTCDay() === 1;
+  return (
+    new Date(`${date}T00:00:00Z`).getUTCDay() === 1
+  );
 }
 
-function lateMinutes(
-  date: string,
-  checkIn: string
-) {
+function lateMinutes(date: string, checkIn: string) {
   const start = new Date(
     `${date}T${String(OFFICE_START_HOUR).padStart(
       2,
@@ -80,6 +80,22 @@ function workedMinutes(
   return Math.floor((end - start) / 60000);
 }
 
+type AttendanceRow = {
+  id: string;
+  employee_id: string;
+  attendance_date: string;
+  check_in_at: string;
+  check_out_at: string | null;
+};
+
+type LeaveRow = {
+  id: string;
+  employee_id: string;
+  start_date: string;
+  end_date: string;
+  leave_type: string;
+};
+
 export async function GET(request: NextRequest) {
   try {
     const authorization =
@@ -113,7 +129,6 @@ export async function GET(request: NextRequest) {
 
     const admin = getSupabaseAdmin();
 
-    // Verify HR access before retrieving employee data.
     const { data: hrAdmin, error: hrError } =
       await admin
         .from("hr_admins")
@@ -152,12 +167,16 @@ export async function GET(request: NextRequest) {
 
     const allDates = datesInMonth(month);
 
-    // Exclude Mondays and future dates.
     const scheduledDates = allDates.filter(
       (date) => date <= today && !isMonday(date)
     );
 
-    const reportEnd = allDates[allDates.length - 1];
+    const scheduledDateSet = new Set(
+      scheduledDates
+    );
+
+    const reportEnd =
+      allDates[allDates.length - 1];
 
     const { data: employees, error: employeeError } =
       await admin
@@ -169,138 +188,333 @@ export async function GET(request: NextRequest) {
 
     if (employeeError) throw employeeError;
 
-    // Fetch all attendance rows for the month.
-    // Pagination avoids Supabase's default row limit.
-    type AttendanceRow = {
-      id: string;
-      employee_id: string;
-      attendance_date: string;
-      check_in_at: string;
-      check_out_at: string | null;
-    };
-
+    // Fetch all attendance records for the month.
     const attendance: AttendanceRow[] = [];
-    const pageSize = 500;
 
-    for (let offset = 0; ; offset += pageSize) {
-      const { data: page, error: attendanceError } =
-        await admin
-          .from("hr_attendance")
-          .select(
-            "id, employee_id, attendance_date, check_in_at, check_out_at"
-          )
-          .gte("attendance_date", `${month}-01`)
-          .lte("attendance_date", reportEnd)
-          .order("attendance_date", { ascending: true })
-          .order("id", { ascending: true })
-          .range(offset, offset + pageSize - 1);
+    for (
+      let offset = 0;
+      ;
+      offset += PAGE_SIZE
+    ) {
+      const { data: page, error } = await admin
+        .from("hr_attendance")
+        .select(
+          "id, employee_id, attendance_date, check_in_at, check_out_at"
+        )
+        .gte("attendance_date", `${month}-01`)
+        .lte("attendance_date", reportEnd)
+        .order("attendance_date", {
+          ascending: true,
+        })
+        .order("id", { ascending: true })
+        .range(
+          offset,
+          offset + PAGE_SIZE - 1
+        );
 
-      if (attendanceError) throw attendanceError;
+      if (error) throw error;
 
       attendance.push(...(page ?? []));
 
-      if (!page || page.length < pageSize) break;
+      if (!page || page.length < PAGE_SIZE) {
+        break;
+      }
     }
 
-    const rows = (employees ?? []).map((employee) => {
-      const records = attendance.filter(
-        (record) => record.employee_id === employee.id
-      );
+    // Fetch approved leave that overlaps this month.
+    const approvedLeaves: LeaveRow[] = [];
 
-      const scheduledRecords = records.filter(
-        (record) =>
-          record.attendance_date <= today &&
-          !isMonday(record.attendance_date)
-      );
-
-      const presentDates = new Set(
-        scheduledRecords.map(
-          (record) => record.attendance_date
+    for (
+      let offset = 0;
+      ;
+      offset += PAGE_SIZE
+    ) {
+      const { data: page, error } = await admin
+        .from("hr_leave_requests")
+        .select(
+          "id, employee_id, start_date, end_date, leave_type"
         )
-      );
+        .eq("status", "approved")
+        .lte("start_date", reportEnd)
+        .gte("end_date", `${month}-01`)
+        .order("start_date", {
+          ascending: true,
+        })
+        .order("id", { ascending: true })
+        .range(
+          offset,
+          offset + PAGE_SIZE - 1
+        );
 
-      const lateRecords = scheduledRecords.filter(
-        (record) =>
-          lateMinutes(
-            record.attendance_date,
-            record.check_in_at
-          ) > 0
-      );
+      if (error) throw error;
 
-      const totalMinutes = scheduledRecords.reduce(
-        (total, record) =>
-          total +
-          workedMinutes(
-            record.check_in_at,
-            record.check_out_at
-          ),
-        0
-      );
+      approvedLeaves.push(...(page ?? []));
 
-      const mondayRecords = records.filter(
-        (record) => isMonday(record.attendance_date)
-      );
+      if (!page || page.length < PAGE_SIZE) {
+        break;
+      }
+    }
 
-      return {
-        employeeId: employee.id,
-        employeeCode: employee.employee_code,
-        fullName: employee.full_name,
-        email: employee.email,
-        department: employee.department,
-        scheduledDays: scheduledDates.length,
-        presentDays: presentDates.size,
-        absentDays: Math.max(
-          0,
-          scheduledDates.length - presentDates.size
-        ),
-        lateDays: new Set(
-          lateRecords.map(
-            (record) => record.attendance_date
+    // Group records by employee to avoid repeatedly
+    // searching the complete attendance and leave lists.
+    const attendanceByEmployee = new Map<
+      string,
+      AttendanceRow[]
+    >();
+
+    for (const record of attendance) {
+      const existing =
+        attendanceByEmployee.get(
+          record.employee_id
+        ) ?? [];
+
+      existing.push(record);
+
+      attendanceByEmployee.set(
+        record.employee_id,
+        existing
+      );
+    }
+
+    const leavesByEmployee = new Map<
+      string,
+      LeaveRow[]
+    >();
+
+    for (const leave of approvedLeaves) {
+      const existing =
+        leavesByEmployee.get(
+          leave.employee_id
+        ) ?? [];
+
+      existing.push(leave);
+
+      leavesByEmployee.set(
+        leave.employee_id,
+        existing
+      );
+    }
+
+    const rows = (employees ?? []).map(
+      (employee) => {
+        const records =
+          attendanceByEmployee.get(
+            employee.id
+          ) ?? [];
+
+        const scheduledRecords =
+          records.filter((record) =>
+            scheduledDateSet.has(
+              record.attendance_date
+            )
+          );
+
+        const presentDates = new Set(
+          scheduledRecords.map(
+            (record) =>
+              record.attendance_date
           )
-        ).size,
-        totalLateMinutes: lateRecords.reduce(
-          (total, record) =>
-            total +
-            lateMinutes(
-              record.attendance_date,
-              record.check_in_at
+        );
+
+        const lateRecords =
+          scheduledRecords.filter(
+            (record) =>
+              lateMinutes(
+                record.attendance_date,
+                record.check_in_at
+              ) > 0
+          );
+
+        const totalMinutes =
+          scheduledRecords.reduce(
+            (total, record) =>
+              total +
+              workedMinutes(
+                record.check_in_at,
+                record.check_out_at
+              ),
+            0
+          );
+
+        const mondayRecords =
+          records.filter((record) =>
+            isMonday(
+              record.attendance_date
+            )
+          );
+
+        const employeeLeaves =
+          leavesByEmployee.get(
+            employee.id
+          ) ?? [];
+
+        // A Set prevents overlapping approved
+        // requests from counting the same day twice.
+        const approvedLeaveDates =
+          new Set<string>();
+
+        const leaveDatesByType: Record<
+          string,
+          Set<string>
+        > = {
+          sick: new Set<string>(),
+          casual: new Set<string>(),
+          emergency: new Set<string>(),
+          unpaid: new Set<string>(),
+        };
+
+        for (const leave of employeeLeaves) {
+          for (const date of scheduledDates) {
+            if (
+              date >= leave.start_date &&
+              date <= leave.end_date &&
+              !presentDates.has(date)
+            ) {
+              approvedLeaveDates.add(
+                date
+              );
+
+              leaveDatesByType[
+                leave.leave_type
+              ]?.add(date);
+            }
+          }
+        }
+
+        const daysWithoutCheckIn =
+          Math.max(
+            0,
+            scheduledDates.length -
+              presentDates.size -
+              approvedLeaveDates.size
+          );
+
+        return {
+          employeeId: employee.id,
+          employeeCode:
+            employee.employee_code,
+          fullName: employee.full_name,
+          email: employee.email,
+          department:
+            employee.department,
+
+          scheduledDays:
+            scheduledDates.length,
+
+          presentDays:
+            presentDates.size,
+
+          // New field: distinct approved
+          // leave dates without attendance.
+          approvedLeaveDays:
+            approvedLeaveDates.size,
+
+          // Existing field retained for
+          // compatibility with the current UI.
+          // Now excludes approved leave.
+          absentDays:
+            daysWithoutCheckIn,
+
+          // Explicit alias for clarity.
+          daysWithoutCheckIn,
+
+          // Optional breakdown for a
+          // future leave summary UI.
+          approvedLeaveBreakdown: {
+            sick:
+              leaveDatesByType.sick.size,
+            casual:
+              leaveDatesByType.casual.size,
+            emergency:
+              leaveDatesByType.emergency
+                .size,
+            unpaid:
+              leaveDatesByType.unpaid.size,
+          },
+
+          lateDays: new Set(
+            lateRecords.map(
+              (record) =>
+                record.attendance_date
+            )
+          ).size,
+
+          totalLateMinutes:
+            lateRecords.reduce(
+              (total, record) =>
+                total +
+                lateMinutes(
+                  record.attendance_date,
+                  record.check_in_at
+                ),
+              0
             ),
-          0
-        ),
-        totalWorkingMinutes: totalMinutes,
-        mondayAttendanceDays: new Set(
-          mondayRecords.map(
-            (record) => record.attendance_date
-          )
-        ).size,
-      };
-    });
+
+          totalWorkingMinutes:
+            totalMinutes,
+
+          mondayAttendanceDays:
+            new Set(
+              mondayRecords.map(
+                (record) =>
+                  record.attendance_date
+              )
+            ).size,
+        };
+      }
+    );
 
     return NextResponse.json({
       success: true,
       month,
       asOfDate: today,
-      officeHours: "11:00 AM – 7:00 PM IST",
+      officeHours:
+        "11:00 AM – 7:00 PM IST",
       weeklyHoliday: "Monday",
+
       summary: {
-        totalEmployees: rows.length,
-        scheduledDays: scheduledDates.length,
-        totalPresentDays: rows.reduce(
-          (sum, row) => sum + row.presentDays,
-          0
-        ),
-        totalAbsentDays: rows.reduce(
-          (sum, row) => sum + row.absentDays,
-          0
-        ),
+        totalEmployees:
+          rows.length,
+
+        scheduledDays:
+          scheduledDates.length,
+
+        totalPresentDays:
+          rows.reduce(
+            (sum, row) =>
+              sum + row.presentDays,
+            0
+          ),
+
+        totalApprovedLeaveDays:
+          rows.reduce(
+            (sum, row) =>
+              sum +
+              row.approvedLeaveDays,
+            0
+          ),
+
+        totalAbsentDays:
+          rows.reduce(
+            (sum, row) =>
+              sum + row.absentDays,
+            0
+          ),
       },
+
       employees: rows,
     });
   } catch (error) {
-    console.error("Monthly HR report error:", error);
+    console.error(
+      "Monthly HR report error:",
+      error
+    );
 
     return NextResponse.json(
-      { error: "Unable to load monthly report." },
+      {
+        error:
+          "Unable to load monthly report.",
+      },
       { status: 500 }
     );
   }
