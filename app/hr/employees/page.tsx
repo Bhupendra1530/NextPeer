@@ -36,6 +36,15 @@ export default function HREmployeesPage() {
   const [scheduleId, setScheduleId] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    full_name: "",
+    email: "",
+    employee_code: "",
+    department: "",
+    schedule_id: "",
+  });
 
   const loadEmployees = useCallback(async () => {
     setLoading(true);
@@ -134,6 +143,44 @@ export default function HREmployeesPage() {
     }
   }
 
+  async function inviteEmployee(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (inviting) return;
+    setInviting(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Please log in first.");
+
+      const response = await fetch("/api/hr/employees/invite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(newEmployee),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Unable to invite employee.");
+      }
+
+      setNewEmployee({
+        full_name: "", email: "", employee_code: "",
+        department: "", schedule_id: "",
+      });
+      setShowAddForm(false);
+      await loadEmployees();
+      setMessage("Employee invitation sent successfully.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setInviting(false);
+    }
+  }
+
   function startEditing(employee: Employee) {
     setEditingId(employee.id);
     setDepartment(employee.department ?? "");
@@ -198,6 +245,13 @@ export default function HREmployeesPage() {
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => { setShowAddForm((value) => !value); setError(""); }}
+            className="rounded-lg bg-blue-600 px-4 py-3 font-medium text-white"
+          >
+            {showAddForm ? "Close Form" : "+ Add Employee"}
+          </button>
           <a
             href="/hr/dashboard"
             className="rounded-lg border px-4 py-3 font-medium"
@@ -232,6 +286,60 @@ export default function HREmployeesPage() {
         >
           {message}
         </div>
+      )}
+
+      {showAddForm && (
+        <form onSubmit={inviteEmployee} className="mb-6 rounded-2xl border bg-white p-5 shadow-sm">
+          <h2 className="mb-2 text-xl font-bold">Add New Employee</h2>
+          <p className="mb-5 text-sm text-gray-500">An email invitation will be sent to the employee.</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-medium">
+              Full Name *
+              <input required maxLength={150} value={newEmployee.full_name}
+                onChange={(e) => setNewEmployee((p) => ({...p, full_name: e.target.value}))}
+                className="mt-2 w-full rounded-lg border px-3 py-2" />
+            </label>
+            <label className="block text-sm font-medium">
+              Email *
+              <input required type="email" maxLength={254} value={newEmployee.email}
+                onChange={(e) => setNewEmployee((p) => ({...p, email: e.target.value}))}
+                className="mt-2 w-full rounded-lg border px-3 py-2" />
+            </label>
+            <label className="block text-sm font-medium">
+              Employee Code *
+              <input required maxLength={50} value={newEmployee.employee_code}
+                onChange={(e) => setNewEmployee((p) => ({...p, employee_code: e.target.value}))}
+                className="mt-2 w-full rounded-lg border px-3 py-2" />
+            </label>
+            <label className="block text-sm font-medium">
+              Department
+              <input maxLength={100} value={newEmployee.department}
+                onChange={(e) => setNewEmployee((p) => ({...p, department: e.target.value}))}
+                className="mt-2 w-full rounded-lg border px-3 py-2" />
+            </label>
+            <label className="block text-sm font-medium sm:col-span-2">
+              Work Schedule *
+              <select required value={newEmployee.schedule_id}
+                onChange={(e) => setNewEmployee((p) => ({...p, schedule_id: e.target.value}))}
+                className="mt-2 w-full rounded-lg border px-3 py-2">
+                <option value="">Select a schedule</option>
+                {schedules.map((schedule) => (
+                  <option key={schedule.id} value={schedule.id}>
+                    {schedule.name} ({schedule.start_time.slice(0, 5)}–{schedule.end_time.slice(0, 5)})
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button type="submit" disabled={inviting || schedules.length === 0}
+              className="rounded-lg bg-blue-600 px-5 py-3 font-medium text-white disabled:opacity-50">
+              {inviting ? "Sending Invitation..." : "Send Invitation"}
+            </button>
+            <button type="button" disabled={inviting} onClick={() => setShowAddForm(false)}
+              className="rounded-lg border px-5 py-3">Cancel</button>
+          </div>
+        </form>
       )}
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
