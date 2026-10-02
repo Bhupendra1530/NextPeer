@@ -6,8 +6,36 @@ import { getSupabaseAdmin } from "@/lib/supabase-admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+function getTodayInIndia() {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+
+  const part = (type: string) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+function isValidDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const date = new Date(`${value}T00:00:00Z`);
+
+  return (
+    !Number.isNaN(date.getTime()) &&
+    date.toISOString().slice(0, 10) === value
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
+    // Step 1: Verify employee session.
     const authorization =
       request.headers.get("authorization");
 
@@ -39,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     const admin = getSupabaseAdmin();
 
-    // Only authorized HR users can access this API.
+    // Step 2: Only authorized HR users.
     const { data: hrAdmin, error: hrError } =
       await admin
         .from("hr_admins")
@@ -56,52 +84,65 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Today's date in India.
-    const parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Kolkata",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).formatToParts(new Date());
+    // Step 3: Get the selected attendance date.
+    // Default to today in Indian Standard Time.
+    const today = getTodayInIndia();
 
-    const part = (type: string) =>
-      parts.find((p) => p.type === type)?.value ?? "";
+    const selectedDate =
+      request.nextUrl.searchParams.get("date") ?? today;
 
-    const today =
-      `${part("year")}-${part("month")}-${part("day")}`;
+    if (!isValidDate(selectedDate)) {
+      return NextResponse.json(
+        { error: "Invalid date. Use YYYY-MM-DD." },
+        { status: 400 }
+      );
+    }
 
+    // Step 4: Retrieve employees.
     const { data: employees, error: employeeError } =
       await admin
         .from("hr_employees")
         .select(
           "id, employee_code, full_name, email, department"
-        );
+        )
+        .order("full_name", { ascending: true });
 
     if (employeeError) throw employeeError;
 
+    // Step 5: Retrieve attendance for selected date.
     const { data: attendance, error: attendanceError } =
       await admin
         .from("hr_attendance")
         .select(
           "id, employee_id, attendance_date, check_in_at, check_out_at"
         )
-        .eq("attendance_date", today);
+        .eq("attendance_date", selectedDate);
 
     if (attendanceError) throw attendanceError;
 
+    // Step 6: Calculate attendance summary.
     const presentIds = new Set(
       (attendance ?? []).map((row) => row.employee_id)
     );
 
+    const totalEmployees = employees?.length ?? 0;
+
+    const presentToday = (employees ?? []).filter(
+      (employee) => presentIds.has(employee.id)
+    ).length;
+
+    const notCheckedIn =
+      totalEmployees - presentToday;
+
+    // Step 7: Return dashboard data.
+    // Existing response fields remain compatible.
     return NextResponse.json({
       success: true,
-      date: today,
+      date: selectedDate,
       summary: {
-        totalEmployees: employees?.length ?? 0,
-        presentToday: presentIds.size,
-        notCheckedIn: (employees ?? []).filter(
-          (employee) => !presentIds.has(employee.id)
-        ).length,
+        totalEmployees,
+        presentToday,
+        notCheckedIn,
       },
       employees: employees ?? [],
       attendance: attendance ?? [],
