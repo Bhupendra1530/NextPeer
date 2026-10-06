@@ -133,17 +133,14 @@ export const FOOTER_LINK_GROUPS: FooterLinkGroup[] = [
       { label: "About Us", href: "/about" },
       { label: "Careers", href: "/careers" },
       // { label: "Contact Us", href: "/contact" },
-      { label: "Become a Mentor", href: "/become-a-mentor" },
       { label: "Privacy Policy", href: "/privacy-policy" },
     ],
   },
   {
     title: "Support",
     links: [
-      { label: "Help Center", href: "/help-center" },
       { label: "Terms & Conditions", href: "/terms" },
       { label: "Refund Policy", href: "/refund-policy" },
-      { label: "Certificate Verification", href: "/verify" },
     ],
   },
 ];
