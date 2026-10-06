@@ -27,6 +27,13 @@ import type {
   TrendingTopic,
   FreeResource,
 } from "@/types";
+import { ARTICLE_CONTENT } from "./blogContent";
+
+export type Article = BlogPost & { category: string; tags: string[] };
+
+function readingTime(content: string) {
+  return `${Math.max(1, Math.ceil(content.trim().split(/\s+/).length / 220))} min read`;
+}
 
 export const BLOG_CATEGORIES: BlogCategory[] = [
   { slug: "programming", label: "Programming", icon: Code2 },
@@ -35,9 +42,9 @@ export const BLOG_CATEGORIES: BlogCategory[] = [
   { slug: "dsa", label: "DSA", icon: Braces },
   { slug: "interview-preparation", label: "Interview Preparation", icon: Target },
   { slug: "career-guidance", label: "Career Guidance", icon: Compass },
-  { slug: "success-stories", label: "Success Stories", icon: Trophy },
+  { slug: "project-guides", label: "Project Guides", icon: Trophy },
   { slug: "student-resources", label: "Student Resources", icon: GraduationCap },
-  { slug: "industry-news", label: "Industry News", icon: Newspaper },
+  { slug: "industry-news", label: "Industry Insights", icon: Newspaper },
 ];
 
 export const FEATURED_POST: FeaturedPost = {
@@ -46,10 +53,11 @@ export const FEATURED_POST: FeaturedPost = {
   excerpt:
     "Learn everything from programming fundamentals to DSA, development, AI, projects, GitHub, resume building, and interview preparation.",
   tags: ["Career", "DSA", "AI", "Roadmap"],
-  readTime: "12 Minutes",
+  readTime: readingTime(ARTICLE_CONTENT["complete-roadmap-software-engineer-2026"]),
+  content: ARTICLE_CONTENT["complete-roadmap-software-engineer-2026"],
 };
 
-export const LATEST_ARTICLES: BlogPost[] = [
+const baseArticles: BlogPost[] = [
   {
     slug: "why-dsa-still-matters-in-the-ai-era",
     number: 1,
@@ -161,8 +169,8 @@ At NextPeer, our goal is to help college students move beyond theory through pra
   {
     slug: "top-50-coding-interview-questions",
     number: 3,
-    title: "Top 50 Coding Interview Questions Asked in Product Companies",
-    excerpt: "Practice the most frequently asked interview questions.",
+    title: "50 Coding Interview Practice Questions for Students",
+    excerpt: "A structured practice list covering arrays, hashing, trees, graphs and dynamic programming.",
     gradient: "from-blue-950 via-slate-900 to-slate-900",
     icon: ListChecks,
     readTime: "15 min read",
@@ -194,7 +202,71 @@ At NextPeer, our goal is to help college students move beyond theory through pra
     icon: Sparkles,
     readTime: "9 min read",
   },
+  {
+    slug: "build-your-first-portfolio-project",
+    number: 7,
+    title: "Build Your First Portfolio Project: A Practical Guide",
+    excerpt: "Choose a useful problem, finish a small project and present your contribution clearly.",
+    gradient: "from-indigo-950 via-blue-950 to-slate-900",
+    icon: Trophy,
+    readTime: "4 min read",
+  },
+  {
+    slug: "sql-system-design-and-aptitude-study-plan",
+    number: 8,
+    title: "SQL, System Design and Aptitude: A Student Study Plan",
+    excerpt: "Prepare with small datasets, clear design exercises and a four-week reasoning routine.",
+    gradient: "from-slate-900 via-amber-950 to-slate-900",
+    icon: Target,
+    readTime: "4 min read",
+  },
+  {
+    slug: "how-to-read-technology-trends",
+    number: 9,
+    title: "How to Read Technology Trends Without Losing Focus",
+    excerpt: "Evaluate sources, test new tools and connect industry information to your learning goals.",
+    gradient: "from-slate-900 via-teal-950 to-slate-900",
+    icon: Newspaper,
+    readTime: "4 min read",
+  },
 ];
+
+const articleTopics: Record<string, { category: string; tags: string[] }> = {
+  "why-dsa-still-matters-in-the-ai-era": { category: "dsa", tags: ["DSA", "AI", "Python", "Placement Tips"] },
+  "mern-vs-nextjs-which-should-you-learn-first": { category: "web-development", tags: ["JavaScript", "React", "Node.js"] },
+  "top-50-coding-interview-questions": { category: "interview-preparation", tags: ["DSA", "Python", "Placement Tips"] },
+  "resume-mistakes-costing-you-interviews": { category: "career-guidance", tags: ["Resume", "Placement Tips"] },
+  "git-github-explained-like-a-beginner": { category: "programming", tags: ["Git", "GitHub", "JavaScript"] },
+  "ai-tools-every-student-should-learn": { category: "artificial-intelligence", tags: ["AI", "Machine Learning", "Student Resources"] },
+  "build-your-first-portfolio-project": { category: "project-guides", tags: ["Projects", "React", "Python", "Placement Tips"] },
+  "sql-system-design-and-aptitude-study-plan": { category: "student-resources", tags: ["SQL", "System Design", "Aptitude"] },
+  "how-to-read-technology-trends": { category: "industry-news", tags: ["AI", "Machine Learning", "Career"] },
+};
+
+export const LATEST_ARTICLES: Article[] = baseArticles.map((post) => ({
+  ...post,
+  ...articleTopics[post.slug],
+  content: ARTICLE_CONTENT[post.slug] ?? post.content,
+  readTime: readingTime(ARTICLE_CONTENT[post.slug] ?? post.content ?? ""),
+}));
+
+export const ALL_ARTICLES: Article[] = [
+  { ...FEATURED_POST, number: 0, gradient: "from-blue-950 via-indigo-950 to-slate-900", icon: Compass, category: "career-guidance" },
+  ...LATEST_ARTICLES,
+];
+
+export function topicSlug(label: string) {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+export function filterArticles({ q = "", category = "", tag = "" }: { q?: string; category?: string; tag?: string }) {
+  const query = q.trim().toLowerCase();
+  return ALL_ARTICLES.filter((post) =>
+    (!category || post.category === category) &&
+    (!tag || post.tags.some((label) => topicSlug(label) === tag)) &&
+    (!query || [post.title, post.excerpt, post.content ?? "", ...post.tags].join(" ").toLowerCase().includes(query))
+  );
+}
 
 export const TRENDING_TOPICS: TrendingTopic[] = [
   { label: "JavaScript" },

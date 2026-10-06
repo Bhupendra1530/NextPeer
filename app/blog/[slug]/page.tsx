@@ -1,210 +1,80 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { FEATURED_POST, LATEST_ARTICLES } from "@/data/blog";
+import { ALL_ARTICLES, BLOG_CATEGORIES, topicSlug } from "@/data/blog";
+import ArticleBody, { headingId } from "@/components/sections/blog/ArticleBody";
+import ArticleCard from "@/components/sections/blog/ArticleCard";
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
+type Props = { params: Promise<{ slug: string }> };
+const getPost = (slug: string) => ALL_ARTICLES.find((post) => post.slug === slug);
 
-function getPost(slug: string) {
-  if (FEATURED_POST.slug === slug) {
-    return FEATURED_POST;
-  }
-
-  return LATEST_ARTICLES.find((post) => post.slug === slug);
+export function generateStaticParams() {
+  return ALL_ARTICLES.map((post) => ({ slug: post.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const post = getPost(slug);
-
-  if (!post) {
-    return {
-      title: "Article Not Found | NextPeer",
-    };
-  }
-
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const post = getPost((await params).slug);
+  if (!post) return { title: "Article Not Found | NextPeer", robots: { index: false } };
+  const url = `https://nextpeer.in/blog/${post.slug}`;
   return {
-    title: `${post.title} | NextPeer`,
-    description: post.excerpt,
-    alternates: {
-      canonical: `https://nextpeer.in/blog/${post.slug}`,
-    },
+    title: post.title, description: post.excerpt,
+    alternates: { canonical: url },
+    openGraph: { title: post.title, description: post.excerpt, url, type: "article" },
+    twitter: { card: "summary", title: post.title, description: post.excerpt },
   };
 }
 
 export default async function BlogPostPage({ params }: Props) {
-  const { slug } = await params;
-  const post = getPost(slug);
-
-  if (!post) {
-    notFound();
-  }
-
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.title,
-    description: post.excerpt,
-    url: `https://nextpeer.in/blog/${post.slug}`,
-    publisher: {
-      "@type": "Organization",
-      name: "NextPeer",
-      url: "https://nextpeer.in",
-    },
+  const post = getPost((await params).slug);
+  if (!post) notFound();
+  const category = BLOG_CATEGORIES.find((item) => item.slug === post.category);
+  const related = ALL_ARTICLES.filter((item) => item.slug !== post.slug)
+    .sort((a, b) => Number(b.category === post.category) - Number(a.category === post.category)).slice(0, 3);
+  const headings = (post.content ?? "").split("\n").filter((line) => line.startsWith("## ")).map((line) => line.slice(3));
+  const schema = {
+    "@context": "https://schema.org", "@type": "Article",
+    headline: post.title, description: post.excerpt,
+    mainEntityOfPage: `https://nextpeer.in/blog/${post.slug}`,
+    author: { "@type": "Organization", name: "NextPeer", url: "https://nextpeer.in" },
+    publisher: { "@type": "Organization", name: "NextPeer", url: "https://nextpeer.in" },
   };
-
-  const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Is DSA still important in the AI era?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. Data Structures and Algorithms remain important because they help developers understand problem solving, efficiency, optimization, and how software works beyond AI-generated code.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Should students learn DSA even when AI can generate code?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Yes. AI can help generate code, but understanding DSA helps students evaluate solutions, debug problems, improve performance, and make better technical decisions.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Is DSA useful for software engineering interviews?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "DSA is commonly used in technical interview preparation because it develops problem-solving skills and helps candidates understand common programming patterns and algorithms.",
-      },
-    },
-  ],
-};
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleSchema),
-        }}
-      />
-
-      <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify(faqSchema),
-  }}
-/>
       <Header />
-
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
+        <nav aria-label="Breadcrumb" className="mb-8 flex flex-wrap gap-2 text-sm text-slate-500">
+          <Link href="/">Home</Link><span aria-hidden="true">/</span>
+          <Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span className="text-slate-700">{category?.label}</span>
+        </nav>
         <article>
-          <p className="mb-4 text-sm font-medium text-blue-600">
-            NextPeer Blog
-          </p>
-
-          <h1 className="mb-6 text-4xl font-bold tracking-tight">
-            {post.title}
-          </h1>
-
-          <p className="mb-8 text-lg text-gray-600">
-            {post.excerpt}
-          </p>
-
-          {"readTime" in post && (
-            <p className="mb-10 text-sm text-gray-500">
-              {post.readTime}
-            </p>
-          )}
-
-          <div className="prose prose-lg max-w-none">
-  {post.content ? (
-    post.content.split("\n").map((line, index) => {
-      const trimmed = line.trim();
-
-      if (!trimmed) {
-        return null;
-      }
-      
-if (trimmed.startsWith("### ")) {
-  return (
-    <h3
-      key={index}
-      className="mt-8 mb-3 text-xl font-semibold tracking-tight"
-    >
-      {trimmed.replace("### ", "")}
-    </h3>
-  );
-}
-      if (trimmed.startsWith("## ")) {
-        return (
-          <h2
-            key={index}
-            className="mt-10 mb-4 text-2xl font-bold tracking-tight"
-          >
-            {trimmed.replace("## ", "")}
-          </h2>
-        );
-      }
-
-      if (/^\d+\.\s/.test(trimmed)) {
-        return (
-          <p key={index} className="ml-4 mb-2">
-            {trimmed}
-          </p>
-        );
-      }
-
-      return (
-        <p key={index} className="mb-5 leading-8 text-gray-700">
-          {trimmed}
-        </p>
-      );
-    })
-  ) : (
-    <p>
-      More detailed content and practical learning resources will be
-      added soon.
-    </p>
-  )}
-</div>
-      <div className="mt-12 border-t pt-8">
-  <h2 className="mb-4 text-2xl font-bold">
-    Continue Learning with NextPeer
-  </h2>
-
-  <p className="mb-4 leading-8 text-gray-700">
-    Build practical, career-focused skills with NextPeer programs designed
-    for college students.
-  </p>
-
-  <div className="flex flex-col gap-3">
-    <a
-      href="/programs"
-      className="font-semibold text-blue-600 hover:underline"
-    >
-      Explore NextPeer Programs →
-    </a>
-
-    <a
-      href="/blog"
-      className="font-semibold text-blue-600 hover:underline"
-    >
-      Read More Career & Technology Articles →
-    </a>
-  </div>
-</div>  </article>
+          <Link href={`/blog?category=${post.category}#latest-articles`} className="text-sm font-semibold text-blue-600">{category?.label}</Link>
+          <h1 className="mb-5 mt-3 text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl">{post.title}</h1>
+          <p className="mb-5 text-lg leading-8 text-slate-600">{post.excerpt}</p>
+          <p className="mb-6 text-sm text-slate-500">By NextPeer Editorial · {post.readTime}</p>
+          <div className="mb-8 flex flex-wrap gap-2">{post.tags.map((tag) => <Link key={tag} href={`/blog?tag=${topicSlug(tag)}#latest-articles`} className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">{tag}</Link>)}</div>
+          {headings.length > 0 && <nav aria-label="Table of contents" className="mb-8 rounded-xl border border-slate-200 bg-slate-50 p-5">
+            <h2 className="font-semibold text-slate-900">In this article</h2>
+            <ul className="mt-3 space-y-2 text-sm">{headings.map((heading) => <li key={heading}><a href={`#${headingId(heading)}`} className="text-blue-600 hover:underline">{heading}</a></li>)}</ul>
+          </nav>}
+          <ArticleBody content={post.content ?? ""} />
+          <div className="mt-12 rounded-xl border border-blue-100 bg-blue-50 p-6">
+            <h2 className="text-xl font-bold text-slate-900">Put your learning into practice</h2>
+            <p className="mt-2 leading-7 text-slate-600">Explore NextPeer training or download a free guide for your next study session.</p>
+            <div className="mt-4 flex flex-wrap gap-4">
+              <Link href="/programs" className="font-semibold text-blue-600 hover:underline">Explore Programs</Link>
+              <Link href="/resources" className="font-semibold text-blue-600 hover:underline">Free Resources</Link>
+              <Link href="/book-session" className="font-semibold text-blue-600 hover:underline">Book Counselling</Link>
+            </div>
+          </div>
+        </article>
+        <section className="mt-12"><h2 className="mb-5 text-xl font-bold text-slate-900">Continue Reading</h2>
+          <div className="grid gap-5 sm:grid-cols-3">{related.map((item) => <ArticleCard key={item.slug} post={item} />)}</div>
+        </section>
+        <Link href="/blog#latest-articles" className="mt-8 inline-block font-semibold text-blue-600 hover:underline">Back to all articles</Link>
       </main>
-
       <Footer />
     </>
   );

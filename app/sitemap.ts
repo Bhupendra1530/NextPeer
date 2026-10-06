@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { PROGRAMS } from "@/data/programs";
 import { FEATURED_POST, LATEST_ARTICLES } from "@/data/blog";
+import { RESOURCES } from "@/data/resources";
 
 const siteUrl = "https://nextpeer.in";
 
@@ -48,5 +49,9 @@ const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
   priority: 0.7,
 }));
 
-return [...staticPages, ...programPages, ...blogPages];
+const resourcePages: MetadataRoute.Sitemap = [
+  { url: `${siteUrl}/resources`, changeFrequency: "monthly", priority: 0.6 },
+  ...RESOURCES.map((resource) => ({ url: `${siteUrl}/resources/${resource.slug}`, changeFrequency: "monthly" as const, priority: 0.5 })),
+];
+return [...staticPages, ...programPages, ...blogPages, ...resourcePages];
 }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PenLine, Search, ArrowRight, Code2, BarChart3, Lightbulb } from "lucide-react";
 
-export default function BlogHero() {
+export default function BlogHero({ query = "", category = "", tag = "" }: { query?: string; category?: string; tag?: string }) {
   return (
     <section className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
@@ -25,17 +25,23 @@ export default function BlogHero() {
               NextPeer.
             </p>
 
-            <div className="relative mt-6 max-w-md">
+            <form action="/blog#latest-articles" method="get" role="search" className="relative mt-6 flex max-w-md gap-2">
+              {category && <input type="hidden" name="category" value={category} />}
+              {tag && <input type="hidden" name="tag" value={tag} />}
               <Search
                 size={18}
                 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
               />
               <input
-                type="text"
+                type="search"
+                name="q"
+                aria-label="Search blog articles"
+                defaultValue={query}
                 placeholder="Search articles, technologies, career tips..."
                 className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
-            </div>
+              <button type="submit" className="rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">Search</button>
+            </form>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link

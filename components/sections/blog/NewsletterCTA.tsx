@@ -1,62 +1,21 @@
-"use client";
-
-import { useState } from "react";
-import { Mail, Send } from "lucide-react";
+import Link from "next/link";
+import { BookOpen, ArrowRight } from "lucide-react";
 
 export default function NewsletterCTA() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) setSubmitted(true);
-  };
-
   return (
     <section className="bg-slate-50 pb-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center gap-6 rounded-2xl border border-blue-100 bg-blue-50 p-6 sm:flex-row sm:justify-between sm:p-8">
+        <div className="flex flex-col gap-6 rounded-2xl border border-blue-100 bg-blue-50 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
           <div className="flex items-start gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
-              <Mail size={20} />
-            </div>
-            <div>
-              <p className="text-base font-bold text-slate-900">
-                Never Miss an Update
-              </p>
-              <p className="mt-1 max-w-md text-sm text-slate-600">
-                Get the latest blogs, coding tips, free resources, and career
-                opportunities delivered directly to your inbox.
-              </p>
+            <BookOpen size={28} className="shrink-0 text-blue-600" />
+            <div><h2 className="text-base font-bold text-slate-900">Turn reading into practical skills</h2>
+              <p className="mt-1 max-w-md text-sm text-slate-600">Download a free study guide or talk to NextPeer about a training path that fits your goals.</p>
             </div>
           </div>
-
-          {submitted ? (
-            <p className="text-sm font-semibold text-blue-700">
-              Thanks for subscribing! 🎉
-            </p>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="flex w-full max-w-sm gap-2 sm:w-auto"
-            >
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-              >
-                Subscribe
-                <Send size={14} />
-              </button>
-            </form>
-          )}
+          <div className="flex flex-wrap gap-3">
+            <Link href="/resources" className="rounded-lg border border-blue-200 bg-white px-4 py-3 text-sm font-semibold text-blue-600">Free Resources</Link>
+            <Link href="/book-session" className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700">Book Counselling <ArrowRight size={14} /></Link>
+          </div>
         </div>
       </div>
     </section>
