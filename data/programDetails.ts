@@ -391,6 +391,1073 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
       { question: "Will I receive a certificate?", answer: "Yes. Successful learners receive a NextPeer certificate." },
     ],
   },
+  "data-science": {
+  "slug": "data-science",
+  "tagline": "Python, Statistics, Machine Learning & Data Visualisation",
+  "titleLine1": "Data Science",
+  "heroInitials": "DS",
+  "titleLine2": "Practical Training for College Students",
+  "description": "Learn Data Science through live classes, guided practice and two practical projects covering python, statistics, machine learning & data visualisation.",
+  "heroBadges": [
+    {
+      "icon": BarChart3,
+      "label": "Python"
+    },
+    {
+      "icon": BarChart3,
+      "label": "Pandas"
+    },
+    {
+      "icon": BarChart3,
+      "label": "NumPy"
+    },
+    {
+      "icon": BarChart3,
+      "label": "SQL"
+    }
+  ],
+  "quickHighlights": [
+    "Live Online Training",
+    "Hands-on Practice",
+    "2 Live Projects",
+    "Career Guidance",
+    "NextPeer Certificate"
+  ],
+  "whyLearnTitle": "Why Learn Data Science?",
+  "whyLearnDescription": "Build foundational skills in python, statistics, machine learning & data visualisation and apply them to practical assignments and portfolio projects.",
+  "whyLearnStats": [
+    {
+      "icon": BarChart3,
+      "value": "Python & Data Handling",
+      "label": "Python Basics & NumPy"
+    },
+    {
+      "icon": BarChart3,
+      "value": "Statistics & Exploration",
+      "label": "Probability & Descriptive Statistics"
+    },
+    {
+      "icon": BarChart3,
+      "value": "SQL & Visualisation",
+      "label": "SQL Queries & Joins"
+    },
+    {
+      "icon": BarChart3,
+      "value": "Machine Learning",
+      "label": "Regression & Classification"
+    }
+  ],
+  "curriculum": [
+    {
+      "number": "01",
+      "icon": BarChart3,
+      "title": "Python & Data Handling",
+      "topics": [
+        "Python Basics",
+        "NumPy",
+        "Pandas",
+        "Data Cleaning"
+      ]
+    },
+    {
+      "number": "02",
+      "icon": BarChart3,
+      "title": "Statistics & Exploration",
+      "topics": [
+        "Probability",
+        "Descriptive Statistics",
+        "Hypothesis Testing",
+        "Exploratory Data Analysis"
+      ]
+    },
+    {
+      "number": "03",
+      "icon": BarChart3,
+      "title": "SQL & Visualisation",
+      "topics": [
+        "SQL Queries",
+        "Joins",
+        "Matplotlib",
+        "Seaborn"
+      ]
+    },
+    {
+      "number": "04",
+      "icon": BarChart3,
+      "title": "Machine Learning",
+      "topics": [
+        "Regression",
+        "Classification",
+        "Clustering",
+        "Model Evaluation"
+      ]
+    },
+    {
+      "number": "05",
+      "icon": BarChart3,
+      "title": "Capstone & Presentation",
+      "topics": [
+        "Feature Engineering",
+        "Model Validation",
+        "Streamlit",
+        "Communicating Findings"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "icon": BarChart3,
+      "title": "Customer Churn Analysis & Prediction"
+    },
+    {
+      "icon": BarChart3,
+      "title": "Sales Data Exploration Dashboard"
+    }
+  ],
+  "tools": [
+    {
+      "icon": BarChart3,
+      "label": "Python"
+    },
+    {
+      "icon": BarChart3,
+      "label": "Pandas"
+    },
+    {
+      "icon": BarChart3,
+      "label": "NumPy"
+    },
+    {
+      "icon": BarChart3,
+      "label": "SQL"
+    },
+    {
+      "icon": BarChart3,
+      "label": "Jupyter Notebook"
+    },
+    {
+      "icon": BarChart3,
+      "label": "Scikit-learn"
+    }
+  ],
+  "careerRoles": [
+    {
+      "label": "Data Science Intern"
+    },
+    {
+      "label": "Junior Data Scientist"
+    },
+    {
+      "label": "Data Analyst"
+    }
+  ],
+  "salaryRows": commonSalaryRows,
+  "whyChoosePoints": commonWhyChoose,
+  "certificateTitle": "Data Science Training & Project Certificate",
+  "journeySteps": commonJourney,
+  "faqs": [
+    {
+      "question": "What knowledge or equipment do I need?",
+      "answer": "The program starts with Python basics. Comfort with school-level mathematics is helpful."
+    },
+    {
+      "question": "Will I complete practical projects?",
+      "answer": "Yes. The program includes guided practice and two practical projects."
+    },
+    {
+      "question": "How do I earn a certificate?",
+      "answer": "Complete the required training, assignments and project assessments to receive a NextPeer certificate."
+    },
+    {
+      "question": "Is a job guaranteed?",
+      "answer": "Career guidance and placement assistance support your job search. Employment is not guaranteed."
+    }
+  ]
+},
+
+  "vlsi": {
+  "slug": "vlsi",
+  "tagline": "Digital Logic, Verilog & RTL Design Fundamentals",
+  "titleLine1": "VLSI",
+  "heroInitials": "VL",
+  "titleLine2": "Practical Training for College Students",
+  "description": "Learn VLSI through live classes, guided practice and two practical projects covering digital logic, verilog & rtl design fundamentals.",
+  "heroBadges": [
+    {
+      "icon": Cpu,
+      "label": "Verilog"
+    },
+    {
+      "icon": Cpu,
+      "label": "Icarus Verilog"
+    },
+    {
+      "icon": Cpu,
+      "label": "GTKWave"
+    },
+    {
+      "icon": Cpu,
+      "label": "Yosys"
+    }
+  ],
+  "quickHighlights": [
+    "Live Online Training",
+    "Hands-on Practice",
+    "2 Live Projects",
+    "Career Guidance",
+    "NextPeer Certificate"
+  ],
+  "whyLearnTitle": "Why Learn VLSI?",
+  "whyLearnDescription": "Build foundational skills in digital logic, verilog & rtl design fundamentals and apply them to practical assignments and portfolio projects.",
+  "whyLearnStats": [
+    {
+      "icon": Cpu,
+      "value": "Digital Electronics",
+      "label": "Boolean Algebra & Logic Gates"
+    },
+    {
+      "icon": Cpu,
+      "value": "Verilog HDL",
+      "label": "Modules & Data Types"
+    },
+    {
+      "icon": Cpu,
+      "value": "RTL Design",
+      "label": "Finite State Machines & Counters"
+    },
+    {
+      "icon": Cpu,
+      "value": "Simulation & Verification",
+      "label": "Waveform Analysis & Functional Verification"
+    }
+  ],
+  "curriculum": [
+    {
+      "number": "01",
+      "icon": Cpu,
+      "title": "Digital Electronics",
+      "topics": [
+        "Boolean Algebra",
+        "Logic Gates",
+        "Combinational Circuits",
+        "Sequential Circuits"
+      ]
+    },
+    {
+      "number": "02",
+      "icon": Cpu,
+      "title": "Verilog HDL",
+      "topics": [
+        "Modules",
+        "Data Types",
+        "Behavioural Modelling",
+        "Testbenches"
+      ]
+    },
+    {
+      "number": "03",
+      "icon": Cpu,
+      "title": "RTL Design",
+      "topics": [
+        "Finite State Machines",
+        "Counters",
+        "Registers",
+        "Synchronous Design"
+      ]
+    },
+    {
+      "number": "04",
+      "icon": Cpu,
+      "title": "Simulation & Verification",
+      "topics": [
+        "Waveform Analysis",
+        "Functional Verification",
+        "Test Cases",
+        "Debugging"
+      ]
+    },
+    {
+      "number": "05",
+      "icon": Cpu,
+      "title": "VLSI Design Flow",
+      "topics": [
+        "Synthesis Concepts",
+        "Timing Basics",
+        "CMOS Fundamentals",
+        "Physical Design Overview"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "icon": Cpu,
+      "title": "Verilog ALU with Testbench"
+    },
+    {
+      "icon": Cpu,
+      "title": "FIFO Controller RTL Design"
+    }
+  ],
+  "tools": [
+    {
+      "icon": Cpu,
+      "label": "Verilog"
+    },
+    {
+      "icon": Cpu,
+      "label": "Icarus Verilog"
+    },
+    {
+      "icon": Cpu,
+      "label": "GTKWave"
+    },
+    {
+      "icon": Cpu,
+      "label": "Yosys"
+    }
+  ],
+  "careerRoles": [
+    {
+      "label": "RTL Design Intern"
+    },
+    {
+      "label": "Verification Intern"
+    },
+    {
+      "label": "Junior Digital Design Engineer"
+    }
+  ],
+  "salaryRows": commonSalaryRows,
+  "whyChoosePoints": commonWhyChoose,
+  "certificateTitle": "VLSI Training & Project Certificate",
+  "journeySteps": commonJourney,
+  "faqs": [
+    {
+      "question": "What knowledge or equipment do I need?",
+      "answer": "Basic digital electronics knowledge is recommended. The program reviews logic fundamentals."
+    },
+    {
+      "question": "Will I complete practical projects?",
+      "answer": "Yes. The program includes guided practice and two practical projects."
+    },
+    {
+      "question": "How do I earn a certificate?",
+      "answer": "Complete the required training, assignments and project assessments to receive a NextPeer certificate."
+    },
+    {
+      "question": "Is a job guaranteed?",
+      "answer": "Career guidance and placement assistance support your job search. Employment is not guaranteed."
+    }
+  ]
+},
+
+  "embedded-systems": {
+  "slug": "embedded-systems",
+  "tagline": "Embedded C, Microcontrollers & Sensor Interfacing",
+  "titleLine1": "Embedded Systems",
+  "heroInitials": "ES",
+  "titleLine2": "Practical Training for College Students",
+  "description": "Learn Embedded Systems through live classes, guided practice and two practical projects covering embedded c, microcontrollers & sensor interfacing.",
+  "heroBadges": [
+    {
+      "icon": Cpu,
+      "label": "Embedded C"
+    },
+    {
+      "icon": Cpu,
+      "label": "Arduino IDE"
+    },
+    {
+      "icon": Cpu,
+      "label": "ESP32"
+    },
+    {
+      "icon": Cpu,
+      "label": "Serial Monitor"
+    }
+  ],
+  "quickHighlights": [
+    "Live Online Training",
+    "Hands-on Practice",
+    "2 Live Projects",
+    "Career Guidance",
+    "NextPeer Certificate"
+  ],
+  "whyLearnTitle": "Why Learn Embedded Systems?",
+  "whyLearnDescription": "Build foundational skills in embedded c, microcontrollers & sensor interfacing and apply them to practical assignments and portfolio projects.",
+  "whyLearnStats": [
+    {
+      "icon": Cpu,
+      "value": "Embedded C",
+      "label": "Data Types & Pointers"
+    },
+    {
+      "icon": Cpu,
+      "value": "Microcontroller Fundamentals",
+      "label": "Architecture & GPIO"
+    },
+    {
+      "icon": Cpu,
+      "value": "Peripheral Interfaces",
+      "label": "UART & SPI"
+    },
+    {
+      "icon": Cpu,
+      "value": "Sensors & Firmware",
+      "label": "Sensor Interfacing & Device Drivers Basics"
+    }
+  ],
+  "curriculum": [
+    {
+      "number": "01",
+      "icon": Cpu,
+      "title": "Embedded C",
+      "topics": [
+        "Data Types",
+        "Pointers",
+        "Bitwise Operations",
+        "Memory Concepts"
+      ]
+    },
+    {
+      "number": "02",
+      "icon": Cpu,
+      "title": "Microcontroller Fundamentals",
+      "topics": [
+        "Architecture",
+        "GPIO",
+        "Interrupts",
+        "Timers"
+      ]
+    },
+    {
+      "number": "03",
+      "icon": Cpu,
+      "title": "Peripheral Interfaces",
+      "topics": [
+        "UART",
+        "SPI",
+        "I2C",
+        "ADC & PWM"
+      ]
+    },
+    {
+      "number": "04",
+      "icon": Cpu,
+      "title": "Sensors & Firmware",
+      "topics": [
+        "Sensor Interfacing",
+        "Device Drivers Basics",
+        "State Machines",
+        "Debugging"
+      ]
+    },
+    {
+      "number": "05",
+      "icon": Cpu,
+      "title": "Connected Systems",
+      "topics": [
+        "IoT Basics",
+        "Communication",
+        "Real-Time Concepts",
+        "System Integration"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "icon": Cpu,
+      "title": "Sensor-Based Monitoring System"
+    },
+    {
+      "icon": Cpu,
+      "title": "Automated Device Controller"
+    }
+  ],
+  "tools": [
+    {
+      "icon": Cpu,
+      "label": "Embedded C"
+    },
+    {
+      "icon": Cpu,
+      "label": "Arduino IDE"
+    },
+    {
+      "icon": Cpu,
+      "label": "ESP32"
+    },
+    {
+      "icon": Cpu,
+      "label": "Serial Monitor"
+    }
+  ],
+  "careerRoles": [
+    {
+      "label": "Embedded Systems Intern"
+    },
+    {
+      "label": "Firmware Intern"
+    },
+    {
+      "label": "Junior Embedded Developer"
+    }
+  ],
+  "salaryRows": commonSalaryRows,
+  "whyChoosePoints": commonWhyChoose,
+  "certificateTitle": "Embedded Systems Training & Project Certificate",
+  "journeySteps": commonJourney,
+  "faqs": [
+    {
+      "question": "What knowledge or equipment do I need?",
+      "answer": "Basic C programming and electronics knowledge is helpful. Hardware exercises require a compatible board and sensors; confirm the kit requirements before enrolling."
+    },
+    {
+      "question": "Will I complete practical projects?",
+      "answer": "Yes. The program includes guided practice and two practical projects."
+    },
+    {
+      "question": "How do I earn a certificate?",
+      "answer": "Complete the required training, assignments and project assessments to receive a NextPeer certificate."
+    },
+    {
+      "question": "Is a job guaranteed?",
+      "answer": "Career guidance and placement assistance support your job search. Employment is not guaranteed."
+    }
+  ]
+},
+
+  "autocad": {
+  "slug": "autocad",
+  "tagline": "2D Drafting, 3D Modelling & Technical Drawings",
+  "titleLine1": "AutoCAD",
+  "heroInitials": "AC",
+  "titleLine2": "Practical Training for College Students",
+  "description": "Learn AutoCAD through live classes, guided practice and two practical projects covering 2d drafting, 3d modelling & technical drawings.",
+  "heroBadges": [
+    {
+      "icon": PenTool,
+      "label": "AutoCAD"
+    },
+    {
+      "icon": PenTool,
+      "label": "DWG Files"
+    },
+    {
+      "icon": PenTool,
+      "label": "Layouts"
+    },
+    {
+      "icon": PenTool,
+      "label": "PDF Plotting"
+    }
+  ],
+  "quickHighlights": [
+    "Live Online Training",
+    "Hands-on Practice",
+    "2 Live Projects",
+    "Career Guidance",
+    "NextPeer Certificate"
+  ],
+  "whyLearnTitle": "Why Learn AutoCAD?",
+  "whyLearnDescription": "Build foundational skills in 2d drafting, 3d modelling & technical drawings and apply them to practical assignments and portfolio projects.",
+  "whyLearnStats": [
+    {
+      "icon": PenTool,
+      "value": "Drawing Fundamentals",
+      "label": "Workspace & Coordinates"
+    },
+    {
+      "icon": PenTool,
+      "value": "Editing & Organisation",
+      "label": "Modify Commands & Layers"
+    },
+    {
+      "icon": PenTool,
+      "value": "Technical Documentation",
+      "label": "Dimensions & Annotations"
+    },
+    {
+      "icon": PenTool,
+      "value": "Layouts & Plotting",
+      "label": "Layouts & Viewports"
+    }
+  ],
+  "curriculum": [
+    {
+      "number": "01",
+      "icon": PenTool,
+      "title": "Drawing Fundamentals",
+      "topics": [
+        "Workspace",
+        "Coordinates",
+        "Units",
+        "Drawing Commands"
+      ]
+    },
+    {
+      "number": "02",
+      "icon": PenTool,
+      "title": "Editing & Organisation",
+      "topics": [
+        "Modify Commands",
+        "Layers",
+        "Blocks",
+        "Object Properties"
+      ]
+    },
+    {
+      "number": "03",
+      "icon": PenTool,
+      "title": "Technical Documentation",
+      "topics": [
+        "Dimensions",
+        "Annotations",
+        "Hatching",
+        "Drawing Standards"
+      ]
+    },
+    {
+      "number": "04",
+      "icon": PenTool,
+      "title": "Layouts & Plotting",
+      "topics": [
+        "Layouts",
+        "Viewports",
+        "Scale",
+        "PDF Export"
+      ]
+    },
+    {
+      "number": "05",
+      "icon": PenTool,
+      "title": "3D Fundamentals",
+      "topics": [
+        "Solids",
+        "Extrude",
+        "Revolve",
+        "Views & Presentation"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "icon": PenTool,
+      "title": "Residential Floor Plan & Drawing Set"
+    },
+    {
+      "icon": PenTool,
+      "title": "Mechanical Component Drafting Project"
+    }
+  ],
+  "tools": [
+    {
+      "icon": PenTool,
+      "label": "AutoCAD"
+    },
+    {
+      "icon": PenTool,
+      "label": "DWG Files"
+    },
+    {
+      "icon": PenTool,
+      "label": "Layouts"
+    },
+    {
+      "icon": PenTool,
+      "label": "PDF Plotting"
+    }
+  ],
+  "careerRoles": [
+    {
+      "label": "CAD Drafter"
+    },
+    {
+      "label": "CAD Technician"
+    },
+    {
+      "label": "Junior Design Assistant"
+    }
+  ],
+  "salaryRows": commonSalaryRows,
+  "whyChoosePoints": commonWhyChoose,
+  "certificateTitle": "AutoCAD Training & Project Certificate",
+  "journeySteps": commonJourney,
+  "faqs": [
+    {
+      "question": "What knowledge or equipment do I need?",
+      "answer": "No prior CAD experience is required. Access to AutoCAD and a compatible computer is needed; confirm software access before enrolling."
+    },
+    {
+      "question": "Will I complete practical projects?",
+      "answer": "Yes. The program includes guided practice and two practical projects."
+    },
+    {
+      "question": "How do I earn a certificate?",
+      "answer": "Complete the required training, assignments and project assessments to receive a NextPeer certificate."
+    },
+    {
+      "question": "Is a job guaranteed?",
+      "answer": "Career guidance and placement assistance support your job search. Employment is not guaranteed."
+    }
+  ]
+},
+
+  "hr-management": {
+  "slug": "hr-management",
+  "tagline": "Recruitment, Employee Engagement & HR Operations",
+  "titleLine1": "HR Management",
+  "heroInitials": "HR",
+  "titleLine2": "Practical Training for College Students",
+  "description": "Learn HR Management through live classes, guided practice and two practical projects covering recruitment, employee engagement & hr operations.",
+  "heroBadges": [
+    {
+      "icon": Users,
+      "label": "Microsoft Excel"
+    },
+    {
+      "icon": Users,
+      "label": "HR Dashboards"
+    },
+    {
+      "icon": Users,
+      "label": "Recruitment Trackers"
+    },
+    {
+      "icon": Users,
+      "label": "HRIS Concepts"
+    }
+  ],
+  "quickHighlights": [
+    "Live Online Training",
+    "Hands-on Practice",
+    "2 Live Projects",
+    "Career Guidance",
+    "NextPeer Certificate"
+  ],
+  "whyLearnTitle": "Why Learn HR Management?",
+  "whyLearnDescription": "Build foundational skills in recruitment, employee engagement & hr operations and apply them to practical assignments and portfolio projects.",
+  "whyLearnStats": [
+    {
+      "icon": Users,
+      "value": "HR Fundamentals",
+      "label": "Employee Lifecycle & HR Functions"
+    },
+    {
+      "icon": Users,
+      "value": "Recruitment & Selection",
+      "label": "Job Descriptions & Sourcing"
+    },
+    {
+      "icon": Users,
+      "value": "Onboarding & HR Operations",
+      "label": "Onboarding & Employee Records"
+    },
+    {
+      "icon": Users,
+      "value": "Performance & Engagement",
+      "label": "Goal Setting & Performance Reviews"
+    }
+  ],
+  "curriculum": [
+    {
+      "number": "01",
+      "icon": Users,
+      "title": "HR Fundamentals",
+      "topics": [
+        "Employee Lifecycle",
+        "HR Functions",
+        "Workforce Planning",
+        "HR Ethics"
+      ]
+    },
+    {
+      "number": "02",
+      "icon": Users,
+      "title": "Recruitment & Selection",
+      "topics": [
+        "Job Descriptions",
+        "Sourcing",
+        "Screening",
+        "Interview Planning"
+      ]
+    },
+    {
+      "number": "03",
+      "icon": Users,
+      "title": "Onboarding & HR Operations",
+      "topics": [
+        "Onboarding",
+        "Employee Records",
+        "Payroll Concepts",
+        "Policy Documentation"
+      ]
+    },
+    {
+      "number": "04",
+      "icon": Users,
+      "title": "Performance & Engagement",
+      "topics": [
+        "Goal Setting",
+        "Performance Reviews",
+        "Learning & Development",
+        "Employee Engagement"
+      ]
+    },
+    {
+      "number": "05",
+      "icon": Users,
+      "title": "HR Analytics & Practice",
+      "topics": [
+        "HR Metrics",
+        "Excel Reporting",
+        "Case Studies",
+        "HR Project Presentation"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "icon": Users,
+      "title": "Recruitment & Onboarding Toolkit"
+    },
+    {
+      "icon": Users,
+      "title": "Employee Engagement & HR Metrics Dashboard"
+    }
+  ],
+  "tools": [
+    {
+      "icon": Users,
+      "label": "Microsoft Excel"
+    },
+    {
+      "icon": Users,
+      "label": "HR Dashboards"
+    },
+    {
+      "icon": Users,
+      "label": "Recruitment Trackers"
+    },
+    {
+      "icon": Users,
+      "label": "HRIS Concepts"
+    }
+  ],
+  "careerRoles": [
+    {
+      "label": "HR Intern"
+    },
+    {
+      "label": "HR Executive"
+    },
+    {
+      "label": "Recruitment Coordinator"
+    }
+  ],
+  "salaryRows": commonSalaryRows,
+  "whyChoosePoints": commonWhyChoose,
+  "certificateTitle": "HR Management Training & Project Certificate",
+  "journeySteps": commonJourney,
+  "faqs": [
+    {
+      "question": "What knowledge or equipment do I need?",
+      "answer": "No prior HR experience is required. Suitable for students interested in people management and business operations."
+    },
+    {
+      "question": "Will I complete practical projects?",
+      "answer": "Yes. The program includes guided practice and two practical projects."
+    },
+    {
+      "question": "How do I earn a certificate?",
+      "answer": "Complete the required training, assignments and project assessments to receive a NextPeer certificate."
+    },
+    {
+      "question": "Is a job guaranteed?",
+      "answer": "Career guidance and placement assistance support your job search. Employment is not guaranteed."
+    }
+  ]
+},
+
+  "business-analytics": {
+  "slug": "business-analytics",
+  "tagline": "Excel, SQL, Power BI & Business Decision-Making",
+  "titleLine1": "Business Analytics",
+  "heroInitials": "BA",
+  "titleLine2": "Practical Training for College Students",
+  "description": "Learn Business Analytics through live classes, guided practice and two practical projects covering excel, sql, power bi & business decision-making.",
+  "heroBadges": [
+    {
+      "icon": LineChart,
+      "label": "Microsoft Excel"
+    },
+    {
+      "icon": LineChart,
+      "label": "SQL"
+    },
+    {
+      "icon": LineChart,
+      "label": "Power BI"
+    },
+    {
+      "icon": LineChart,
+      "label": "Power Query"
+    }
+  ],
+  "quickHighlights": [
+    "Live Online Training",
+    "Hands-on Practice",
+    "2 Live Projects",
+    "Career Guidance",
+    "NextPeer Certificate"
+  ],
+  "whyLearnTitle": "Why Learn Business Analytics?",
+  "whyLearnDescription": "Build foundational skills in excel, sql, power bi & business decision-making and apply them to practical assignments and portfolio projects.",
+  "whyLearnStats": [
+    {
+      "icon": LineChart,
+      "value": "Business Analytics Foundations",
+      "label": "Business Questions & KPIs"
+    },
+    {
+      "icon": LineChart,
+      "value": "Excel for Analysis",
+      "label": "Formulas & Pivot Tables"
+    },
+    {
+      "icon": LineChart,
+      "value": "SQL for Business",
+      "label": "Queries & Joins"
+    },
+    {
+      "icon": LineChart,
+      "value": "Power BI & Dashboards",
+      "label": "Power Query & Data Models"
+    }
+  ],
+  "curriculum": [
+    {
+      "number": "01",
+      "icon": LineChart,
+      "title": "Business Analytics Foundations",
+      "topics": [
+        "Business Questions",
+        "KPIs",
+        "Data Types",
+        "Analytical Thinking"
+      ]
+    },
+    {
+      "number": "02",
+      "icon": LineChart,
+      "title": "Excel for Analysis",
+      "topics": [
+        "Formulas",
+        "Pivot Tables",
+        "Data Cleaning",
+        "Charts"
+      ]
+    },
+    {
+      "number": "03",
+      "icon": LineChart,
+      "title": "SQL for Business",
+      "topics": [
+        "Queries",
+        "Joins",
+        "Aggregations",
+        "Business Reporting"
+      ]
+    },
+    {
+      "number": "04",
+      "icon": LineChart,
+      "title": "Power BI & Dashboards",
+      "topics": [
+        "Power Query",
+        "Data Models",
+        "DAX Basics",
+        "Dashboard Design"
+      ]
+    },
+    {
+      "number": "05",
+      "icon": LineChart,
+      "title": "Decision-Making & Storytelling",
+      "topics": [
+        "Sales Analysis",
+        "Customer Segmentation",
+        "Forecasting Basics",
+        "Recommendations"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "icon": LineChart,
+      "title": "Sales & Profitability Dashboard"
+    },
+    {
+      "icon": LineChart,
+      "title": "Customer Segmentation & Business Recommendations"
+    }
+  ],
+  "tools": [
+    {
+      "icon": LineChart,
+      "label": "Microsoft Excel"
+    },
+    {
+      "icon": LineChart,
+      "label": "SQL"
+    },
+    {
+      "icon": LineChart,
+      "label": "Power BI"
+    },
+    {
+      "icon": LineChart,
+      "label": "Power Query"
+    },
+    {
+      "icon": LineChart,
+      "label": "DAX"
+    }
+  ],
+  "careerRoles": [
+    {
+      "label": "Business Analyst Intern"
+    },
+    {
+      "label": "BI Analyst"
+    },
+    {
+      "label": "Reporting Analyst"
+    }
+  ],
+  "salaryRows": commonSalaryRows,
+  "whyChoosePoints": commonWhyChoose,
+  "certificateTitle": "Business Analytics Training & Project Certificate",
+  "journeySteps": commonJourney,
+  "faqs": [
+    {
+      "question": "What knowledge or equipment do I need?",
+      "answer": "No coding experience is required. The program starts with spreadsheet and analytics fundamentals."
+    },
+    {
+      "question": "Will I complete practical projects?",
+      "answer": "Yes. The program includes guided practice and two practical projects."
+    },
+    {
+      "question": "How do I earn a certificate?",
+      "answer": "Complete the required training, assignments and project assessments to receive a NextPeer certificate."
+    },
+    {
+      "question": "Is a job guaranteed?",
+      "answer": "Career guidance and placement assistance support your job search. Employment is not guaranteed."
+    }
+  ]
+},
 };
 
 export const DEFAULT_HELP_ICON = HelpCircle;
