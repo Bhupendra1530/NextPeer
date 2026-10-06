@@ -232,7 +232,7 @@ import {
       price: 11999,
     },
     {
-      slug: "business-analytics",
+      slug: "business-analyticS",
       title: "Business Analytics",
       subtitle: "Excel, SQL, Power BI & Business Decision-Making",
       category: "data-analytics",
