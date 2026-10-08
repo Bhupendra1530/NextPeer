@@ -106,6 +106,7 @@ export default function Header() {
 
         {/* Desktop Authentication */}
         <div className="hidden items-center gap-3 lg:flex">
+          <Link href="/lms" className="rounded-lg bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100">LMS Portal</Link>
           {!authLoading &&
             (user ? (
               <>
@@ -175,6 +176,7 @@ export default function Header() {
             ))}
 
             <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 pt-3">
+              <Link href="/lms" onClick={() => setIsMenuOpen(false)} className="rounded-lg bg-blue-50 px-4 py-2 text-center text-sm font-semibold text-blue-600">LMS Portal</Link>
               {!authLoading &&
                 (user ? (
                   <>

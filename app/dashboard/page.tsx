@@ -282,6 +282,7 @@ export default function DashboardPage() {
               Explore Programs
               <ArrowRight size={17} />
             </Link>
+            <Link href="/lms" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white sm:ml-3">Open LMS Portal <BookOpen size={17} /></Link>
           </div>
         </section>
 

@@ -32,7 +32,9 @@ export default function LoginPage() {
     }
 
     // Successful login
-    router.push("/");
+    const next = new URLSearchParams(window.location.search).get("next");
+    // Only permit same-site LMS destinations; never follow arbitrary redirect URLs.
+    router.push(next && /^\/lms(?:\/|$)/.test(next) && !/[\\\r\n]/.test(next) ? next : "/");
     router.refresh();
   };
 
