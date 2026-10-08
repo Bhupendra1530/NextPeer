@@ -245,6 +245,20 @@ import {
       duration: "8 Weeks",
       price: 11999,
     },
+    {
+      slug: "finance",
+      title: "Finance",
+      subtitle: "Financial Analysis, Excel Modelling & Corporate Finance",
+      category: "business-skills",
+      badge: "New",
+      gradient: "from-emerald-950 via-slate-900 to-slate-900",
+      icon: Briefcase,
+      rating: 0,
+      reviewCount: 0,
+      level: "Beginner to Advanced",
+      duration: "8 Weeks",
+      price: 11999,
+    },
   ];
   
   export const PROGRAM_TRUST_POINTS: ProgramTrustPoint[] = [
