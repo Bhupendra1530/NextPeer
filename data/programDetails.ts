@@ -1458,6 +1458,68 @@ export const PROGRAM_DETAILS: Record<string, ProgramDetail> = {
     }
   ]
 },
+  "finance": {
+    slug: "finance",
+    tagline: "Understand Financial Decisions with Practical Analysis",
+    titleLine1: "Finance",
+    heroInitials: "FI",
+    titleLine2: "Accounting. Analysis. Modelling. Business Decisions.",
+    description: "Build finance foundations through live classes, Excel exercises and two practical projects covering financial statements, budgeting, corporate finance and financial modelling.",
+    heroBadges: [
+      { icon: FileText, label: "Financial Statements" },
+      { icon: LineChart, label: "Financial Analysis" },
+      { icon: BarChart3, label: "Excel Modelling" },
+      { icon: Briefcase, label: "Corporate Finance" },
+    ],
+    quickHighlights: ["Live Online Training", "Excel Practice", "Business Case Studies", "2 Live Projects", "Career Guidance", "NextPeer Certificate"],
+    whyLearnTitle: "Why Learn Finance?",
+    whyLearnDescription: "Finance helps you interpret business performance, plan budgets and evaluate decisions using financial data. Practical analysis connects accounting information to business questions.",
+    whyLearnStats: [
+      { icon: FileText, value: "Statements", label: "Understand Business Performance" },
+      { icon: BarChart3, value: "Excel", label: "Build Financial Models" },
+      { icon: LineChart, value: "Analysis", label: "Interpret Financial Ratios" },
+      { icon: Briefcase, value: "Decisions", label: "Evaluate Business Scenarios" },
+    ],
+    curriculum: [
+      { number: "01", icon: Briefcase, title: "Finance & Accounting Foundations", topics: ["Business Finance", "Accounting Equation", "Accruals and Cash", "Revenue and Expenses", "Financial Terminology"] },
+      { number: "02", icon: FileText, title: "Financial Statements", topics: ["Income Statement", "Balance Sheet", "Cash Flow Statement", "Statement Linkages", "Reading Annual Reports"] },
+      { number: "03", icon: BarChart3, title: "Excel for Finance", topics: ["Financial Formulas", "Data Cleaning", "Lookup Functions", "Pivot Tables", "Charts and Model Checks"] },
+      { number: "04", icon: LineChart, title: "Financial Statement Analysis", topics: ["Profitability Ratios", "Liquidity Ratios", "Leverage Ratios", "Working Capital", "Trend and Peer Analysis"] },
+      { number: "05", icon: Target, title: "Budgeting & Forecasting", topics: ["Revenue Drivers", "Cost Planning", "Operating Budgets", "Cash Budgets", "Variance Analysis"] },
+      { number: "06", icon: Sigma, title: "Corporate Finance", topics: ["Time Value of Money", "Discounting", "Capital Budgeting", "NPV and IRR", "Funding and Cost of Capital Concepts"] },
+      { number: "07", icon: Layers, title: "Financial Modelling & Valuation Basics", topics: ["Model Structure", "Assumption Documentation", "Projected Statements", "DCF Concepts", "Scenario and Sensitivity Analysis"] },
+      { number: "08", icon: FolderKanban, title: "Projects & Career Preparation", topics: ["Financial Analysis Report", "Budget and Forecast Model", "Model Validation", "Presenting Findings", "Finance Interview Practice"] },
+    ],
+    projects: [
+      { icon: FileText, title: "Company Financial Statement Analysis Report" },
+      { icon: BarChart3, title: "Excel Budget, Cash Forecast & Scenario Model" },
+    ],
+    tools: [
+      { icon: BarChart3, label: "Microsoft Excel" },
+      { icon: FileText, label: "Google Sheets" },
+      { icon: FileText, label: "Annual Reports" },
+      { icon: LineChart, label: "Financial Dashboards" },
+    ],
+    careerRoles: [
+      { label: "Finance Intern" },
+      { label: "Junior Financial Analyst" },
+      { label: "FP&A Intern" },
+      { label: "Finance Operations Associate" },
+      { label: "Accounts and Finance Trainee" },
+    ],
+    salaryRows: commonSalaryRows,
+    whyChoosePoints: commonWhyChoose,
+    certificateTitle: "Finance Training & Project Certificate",
+    journeySteps: commonJourney,
+    faqs: [
+      { question: "Do I need prior finance experience?", answer: "No. The course starts with finance and accounting foundations. Basic arithmetic and spreadsheet familiarity are helpful." },
+      { question: "Which software do I need?", answer: "You need a computer with spreadsheet access. Microsoft Excel is used for modelling practice; many foundational exercises can also be completed in Google Sheets." },
+      { question: "Will I complete practical projects?", answer: "Yes. You will prepare a financial statement analysis report and an Excel budget and cash forecast model using sample or publicly available business data." },
+      { question: "Is this a trading or investment advisory course?", answer: "The course focuses on business finance, financial analysis and modelling. Valuation exercises are educational case studies." },
+      { question: "How do I earn a certificate?", answer: "Complete the required training, assignments and project assessments to receive a NextPeer certificate." },
+      { question: "Is a job guaranteed?", answer: "Career guidance and placement assistance support your preparation and job search. Employment is not guaranteed." },
+    ],
+  },
 };
 
 export const DEFAULT_HELP_ICON = HelpCircle;
